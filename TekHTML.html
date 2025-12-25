@@ -1,0 +1,4554 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SON KULLANICI | THE LAST USER</title>
+    <style>
+        :root {
+            --xp-blue-taskbar: #245DDA;
+            --xp-start-green: #3C8D0D;
+            --xp-start-hover: #2E6CAD;
+            --xp-window-active-top: #0058EE;
+            --xp-window-active-bottom: #166BAE;
+            --xp-window-inactive: #7697BB;
+            --font-stack: 'Tahoma', 'Segoe UI', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: var(--font-stack);
+            background-color: #000;
+        }
+
+        /* Boot Screen */
+        #boot-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+        }
+
+        .boot-logo {
+            margin-bottom: 50px;
+            image-rendering: pixelated;
+        }
+
+        .loading-bar-container {
+            width: 200px;
+            height: 15px;
+            border: 2px solid #555;
+            border-radius: 4px;
+            padding: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    #2A62C9 30%,
+                    #5F8DDB 50%,
+                    #2A62C9 70%,
+                    transparent 100%);
+            background-size: 50% 100%;
+            animation: bootLoad 2s linear infinite;
+        }
+
+        @keyframes bootLoad {
+            0% {
+                background-position: -150% 0;
+            }
+
+            100% {
+                background-position: 250% 0;
+            }
+        }
+
+        @keyframes bootLoad {
+            0% {
+                background-position: -150% 0;
+            }
+
+            100% {
+                background-position: 250% 0;
+            }
+        }
+
+        /* Login Screen */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #5A7EDC;
+            z-index: 9998;
+            display: flex;
+            flex-direction: row;
+            /* Split 50/50 roughly */
+            align-items: center;
+        }
+
+        .login-left {
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to bottom, #5A7EDC 0%, #6487E7 100%);
+            border-right: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .login-right {
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, #5173D1 0%, #3B5AA8 100%);
+            display: flex;
+            justify-content: flex-start;
+            /* Align closer to the center line */
+            align-items: center;
+            padding-left: 30px;
+        }
+
+        .login-user-container {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .login-avatar {
+            width: 60px;
+            height: 60px;
+            background-color: orange;
+            border: 3px solid white;
+            border-radius: 4px;
+            margin-right: 15px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg');
+            /* Placeholder */
+            background-size: cover;
+        }
+
+        .login-details {
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+
+        .login-username {
+            font-size: 20px;
+            font-weight: normal;
+            margin-bottom: 10px;
+        }
+
+        .xp-input {
+            border: 1px solid #7F9DB9;
+            padding: 3px;
+            border-radius: 2px;
+            width: 150px;
+            height: 25px;
+            font-family: inherit;
+            margin-right: 5px;
+        }
+
+        .xp-go-btn {
+            width: 25px;
+            height: 25px;
+            background: linear-gradient(to bottom, #4CAF50 0%, #2E7D32 100%);
+            border: 1px solid white;
+            border-radius: 3px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .login-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+        }
+
+        .turn-off-btn {
+            color: white;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .turn-off-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* Desktop */
+        #desktop {
+            width: 100%;
+            height: calc(100% - 30px);
+            /* taskbar height */
+            position: relative;
+            background: url('https://dn721309.ca.archive.org/0/items/theoriginalfilesofsomewindowswallpapers/bliss%20600dpi.jpg') no-repeat center center fixed;
+            background-color: #3B6EA5;
+            /* Fallback */
+            background-size: cover;
+            display: none;
+            /* Hidden until boot finishes */
+        }
+
+        /* Icons */
+        .desktop-icon {
+            width: 70px;
+            text-align: center;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            margin: 10px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: default;
+        }
+
+        .desktop-icon:hover {
+            background-color: rgba(0, 51, 153, 0.3);
+            outline: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+
+        .desktop-icon img {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 5px;
+        }
+
+        /* Window System */
+        .window {
+            position: absolute;
+            background-color: #ECE9D8;
+            border: 1px solid #0055EA;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+            min-height: 100px;
+        }
+
+        .title-bar {
+            height: 30px;
+            background: linear-gradient(to bottom, var(--xp-window-active-top) 0%, var(--xp-window-active-bottom) 100%);
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5px;
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+            text-shadow: 1px 1px 1px #000;
+        }
+
+        .title-bar-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .control-btn {
+            width: 21px;
+            height: 21px;
+            border: 1px solid white;
+            border-radius: 3px;
+            background-color: #D72828;
+            /* Close red */
+            color: white;
+            font-size: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .control-btn.minimize {
+            background-color: #245DDA;
+        }
+
+        .control-btn.maximize {
+            background-color: #245DDA;
+        }
+
+        .window-content {
+            flex: 1;
+            padding: 5px;
+            overflow: auto;
+            font-size: 12px;
+        }
+
+        /* Taskbar */
+        #taskbar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(to bottom, #245DDA 0%, #174298 15%, #245DDA 100%);
+            display: none;
+            /* Hidden until boot */
+            align-items: center;
+            padding: 0;
+            z-index: 10000;
+            border-top: 1px solid #4882F2;
+        }
+
+        #start-btn {
+            width: 100px;
+            height: 100%;
+            background: linear-gradient(to bottom, #3C8D0D 0%, #307508 100%);
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            font-weight: bold;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.4);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            margin-right: 5px;
+        }
+
+        #start-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        #start-btn img {
+            width: 18px;
+            height: 18px;
+            margin-right: 5px;
+        }
+
+        #task-band {
+            flex: 1;
+            display: flex;
+            padding-left: 5px;
+            gap: 2px;
+        }
+
+        .task-item {
+            width: 150px;
+            height: 24px;
+            background-color: #3C81F0;
+            border-radius: 3px;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 5px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 3px;
+            box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .task-item:hover {
+            background-color: #5392F3;
+        }
+
+        .task-item.active {
+            background-color: #1E52B7;
+            box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        #system-tray {
+            width: 100px;
+            height: 100%;
+            background-color: #0B73E0;
+            border-left: 1px solid #144985;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Start Menu */
+        #start-menu {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            width: 380px;
+            height: 480px;
+            background-color: white;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            box-shadow: 2px -2px 5px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 10001;
+            flex-direction: column;
+        }
+
+        .start-header {
+            height: 50px;
+            background: linear-gradient(to bottom, #1868CE 0%, #0E4EAF 100%);
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background-color: orange;
+            border: 2px solid white;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+
+        .start-body {
+            flex: 1;
+            display: flex;
+            border: 1px solid #1868CE;
+            border-top: none;
+            border-bottom: none;
+        }
+
+        .start-left {
+            width: 50%;
+            background-color: white;
+            padding: 5px;
+        }
+
+        .start-right {
+            width: 50%;
+            background-color: #D3E5FA;
+            border-left: 1px solid #A8C8EE;
+            padding: 5px;
+        }
+
+        .start-footer {
+            height: 40px;
+            background: linear-gradient(to bottom, #1868CE 0%, #0E4EAF 100%);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-size: 11px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            margin-bottom: 2px;
+            font-size: 12px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background-color: #316AC5;
+            color: white;
+        }
+
+        .start-right .menu-item {
+            font-weight: bold;
+            color: #1A3E77;
+        }
+
+        .start-right .menu-item:hover {
+            background-color: #316AC5;
+            color: white;
+        }
+
+        /* Applications Styling */
+
+        /* File Explorer */
+        .explorer-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background-color: #ECE9D8;
+        }
+
+        .explorer-toolbar {
+            height: auto;
+            border-bottom: 1px solid #D0D0BF;
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 2px 0;
+        }
+
+        .explorer-menu-bar {
+            display: flex;
+            gap: 10px;
+            font-size: 11px;
+            padding: 2px 5px;
+            background-color: #ECE9D8;
+        }
+
+        .explorer-nav-bar {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 5px;
+        }
+
+        .explorer-address-bar {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 5px;
+            font-size: 11px;
+        }
+
+        .nav-btn {
+            width: 24px;
+            height: 24px;
+            border: 1px solid transparent;
+            border-radius: 2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            border: 1px solid #CCC;
+            background-color: #F7F7F7;
+        }
+
+        .explorer-body {
+            flex: 1;
+            display: flex;
+        }
+
+        .explorer-sidebar {
+            width: 180px;
+            background: linear-gradient(to bottom, #7BA2CE 0%, #6487DB 100%);
+            padding: 10px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .sidebar-section {
+            background-color: white;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(to right, #FFF 0%, #C6D3F7 100%);
+            padding: 5px;
+            color: #215DC6;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .sidebar-content {
+            background-color: #D6DFF7;
+            color: #215DC6;
+            padding: 10px;
+        }
+
+        .explorer-main {
+            flex: 1;
+            background-color: white;
+            padding: 10px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            grid-auto-rows: 80px;
+        }
+
+        .file-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 5px;
+            font-size: 11px;
+            color: #333;
+            cursor: default;
+        }
+
+        .file-item:hover {
+            background-color: #E8F0FA;
+            border: 1px solid #A8C8E8;
+        }
+
+        .file-item.selected {
+            background-color: #316AC5;
+            color: white;
+            border: 1px solid #316AC5;
+        }
+
+        .file-icon {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        /* Internet Explorer */
+        .ie-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .ie-header {
+            background-color: #ECE9D8;
+            border-bottom: 1px solid #999;
+        }
+
+        .ie-content {
+            flex: 1;
+            background-color: white;
+            position: relative;
+        }
+
+        .ie-placeholder-page {
+            font-family: serif;
+            padding: 20px;
+        }
+
+        .google-logo {
+            color: red;
+            font-size: 30px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Calculator Styles */
+        .calc-container {
+            padding: 10px;
+            background-color: #DADADA;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .calc-display {
+            background-color: white;
+            border: 1px solid #888;
+            height: 30px;
+            margin-bottom: 10px;
+            text-align: right;
+            padding: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            flex: 1;
+        }
+
+        .calc-btn {
+            background-color: #F0F0F0;
+            border: 1px solid #888;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .calc-btn:active {
+            border-style: inset;
+        }
+
+        .calc-btn.red {
+            color: red;
+        }
+
+        .calc-btn.blue {
+            color: blue;
+        }
+
+        /* Minesweeper Styles */
+        .mine-container {
+            background-color: #C0C0C0;
+            padding: 5px;
+            border: 2px outset white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+        }
+
+        .mine-header {
+            width: 100%;
+            background-color: #C0C0C0;
+            border: 2px inset white;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            padding: 5px;
+            align-items: center;
+        }
+
+        .mine-counter {
+            background-color: black;
+            color: red;
+            font-family: monospace;
+            font-size: 20px;
+            padding: 2px;
+            border: 1px inset white;
+            width: 40px;
+            text-align: center;
+        }
+
+        .mine-face {
+            width: 24px;
+            height: 24px;
+            background-color: #C0C0C0;
+            border: 2px outset white;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+        }
+
+        .mine-face:active {
+            border-style: inset;
+        }
+
+        .mine-grid {
+            border: 3px inset #C0C0C0;
+            display: grid;
+            background-color: #808080;
+        }
+
+        .mine-cell {
+            width: 16px;
+            height: 16px;
+            background-color: #C0C0C0;
+            border: 2px outset white;
+            font-size: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: default;
+            font-weight: bold;
+        }
+
+        .mine-cell.revealed {
+            border: 1px solid #808080;
+            outline: 1px solid #808080;
+            border: none;
+            padding: 1px;
+        }
+
+        .mine-cell.mine {
+            background-color: red;
+        }
+
+        .mine-cell:active {
+            border: none;
+            padding: 2px;
+        }
+
+        .c1 {
+            color: blue;
+        }
+
+        .c2 {
+            color: green;
+        }
+
+        .c3 {
+            color: red;
+        }
+
+        .c4 {
+            color: darkblue;
+        }
+
+        .c8 {
+            color: gray;
+        }
+
+        /* Paint Styles */
+        .paint-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background-color: #C0C0C0;
+        }
+
+        .paint-toolbar {
+            display: flex;
+            gap: 5px;
+            padding: 5px;
+            background-color: #ECE9D8;
+            border-bottom: 1px solid #999;
+        }
+
+        .paint-tool {
+            width: 24px;
+            height: 24px;
+            border: 1px solid #888;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background-color: #ECE9D8;
+        }
+
+        .paint-tool.active {
+            background-color: white;
+            border: 1px inset black;
+        }
+
+        .paint-canvas-area {
+            flex: 1;
+            overflow: auto;
+            padding: 10px;
+            background-color: #808080;
+            display: flex;
+        }
+
+        .paint-canvas {
+            background-color: white;
+            cursor: crosshair;
+        }
+
+        .paint-palette {
+            display: flex;
+            padding: 5px;
+            background-color: #ECE9D8;
+            border-top: 1px solid #999;
+            flex-wrap: wrap;
+            gap: 2px;
+            height: 40px;
+        }
+
+        .paint-color {
+            width: 15px;
+            height: 15px;
+            border: 1px inset white;
+            cursor: pointer;
+        }
+
+        /* XP Button Styles */
+        .xp-btn {
+            background: linear-gradient(to bottom, #fff 0%, #e3e3e3 40%, #c8c8c8 100%);
+            border: 1px solid #707070;
+            border-radius: 3px;
+            padding: 4px 12px;
+            font-family: Tahoma, sans-serif;
+            font-size: 11px;
+            cursor: pointer;
+            box-shadow: inset 0 1px 0 #fff;
+        }
+
+        .xp-btn:hover {
+            background: linear-gradient(to bottom, #fff 0%, #d7d7d7 40%, #b8b8b8 100%);
+        }
+
+        .xp-btn:active {
+            background: linear-gradient(to bottom, #c8c8c8 0%, #d3d3d3 100%);
+            box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Window Active/Inactive States */
+        .window.inactive .title-bar {
+            background: linear-gradient(to bottom, #7A96DF 0%, #7697BB 100%);
+        }
+
+        /* Desktop Icon Improvements */
+        .desktop-icon span {
+            font-size: 11px;
+            margin-top: 2px;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .desktop-icon.selected {
+            background-color: rgba(11, 97, 204, 0.4);
+            outline: 1px dotted white;
+        }
+
+        /* Scrollbar Styling (XP Style) */
+        ::-webkit-scrollbar {
+            width: 17px;
+            height: 17px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-left: 1px solid #dfdfdf;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to right, #ece9d8, #e4dcd3);
+            border: 1px solid #999;
+            border-radius: 0;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to right, #d4cfc7, #cdc6bd);
+        }
+
+        ::-webkit-scrollbar-button {
+            background: #ece9d8;
+            border: 1px solid #999;
+            height: 17px;
+            width: 17px;
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: absolute;
+            background: #fff;
+            border: 1px solid #aaa;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            padding: 2px 0;
+            z-index: 99999;
+            min-width: 150px;
+        }
+
+        .context-menu-item {
+            padding: 4px 20px;
+            font-size: 11px;
+            cursor: default;
+        }
+
+        .context-menu-item:hover {
+            background-color: #316AC5;
+            color: white;
+        }
+
+        .context-menu-separator {
+            height: 1px;
+            background: #ccc;
+            margin: 3px 0;
+        }
+
+        /* Tooltip */
+        .xp-tooltip {
+            position: absolute;
+            background: #ffffe1;
+            border: 1px solid #000;
+            padding: 2px 5px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 99999;
+            box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* IE Container Fix */
+        .ie-container {
+            height: 100%;
+        }
+
+        .ie-content {
+            height: calc(100% - 80px);
+            overflow: auto;
+        }
+
+        /* ===============================================
+   HORROR GAME STYLES - SON KULLANICI
+   =============================================== */
+
+        /* Language Selection Screen */
+        #language-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+        }
+
+        .lang-container {
+            text-align: center;
+            color: #fff;
+        }
+
+        .lang-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .lang-container h2 {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-weight: 300;
+            margin-bottom: 40px;
+            font-size: 24px;
+        }
+
+        .lang-buttons {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .lang-btn {
+            padding: 15px 50px;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.05);
+        }
+
+        /* Intro Screen */
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99998;
+        }
+
+        .intro-text {
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            max-width: 600px;
+            line-height: 1.8;
+            text-align: center;
+            opacity: 0;
+            animation: fadeInText 2s ease forwards;
+        }
+
+        @keyframes fadeInText {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Login Screen Updates */
+        .login-user-container {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .login-user-container:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .guest-avatar,
+        .admin-avatar {
+            width: 48px;
+            height: 48px;
+            background: #3b6ea5;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+        }
+
+        .admin-avatar {
+            background: #8b0000;
+        }
+
+        .back-link {
+            color: #fff;
+            font-size: 11px;
+            margin-top: 10px;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        /* Admin Desktop - Creepy Version */
+        .admin-desktop {
+            background: url('assets/wallpaper_dark.jpg') center/cover no-repeat, #1a0a0a !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 30px);
+        }
+
+        .admin-desktop::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(20, 0, 0, 0.3);
+            pointer-events: none;
+        }
+
+        /* ECHO Overlay */
+        #echo-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99990;
+            pointer-events: none;
+        }
+
+        .echo-figure {
+            position: absolute;
+            width: 200px;
+            height: 400px;
+            background: linear-gradient(to bottom,
+                    transparent 0%,
+                    rgba(139, 0, 0, 0.3) 20%,
+                    rgba(139, 0, 0, 0.5) 50%,
+                    rgba(139, 0, 0, 0.3) 80%,
+                    transparent 100%);
+            filter: blur(8px);
+            opacity: 0;
+            animation: echoAppear 3s ease-in-out;
+        }
+
+        @keyframes echoAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            20% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+
+            80% {
+                opacity: 0.4;
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1);
+            }
+        }
+
+        .echo-figure::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.8) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .echo-figure::after {
+            content: '';
+            position: absolute;
+            top: 100px;
+            left: 30px;
+            width: 140px;
+            height: 200px;
+            background: linear-gradient(to bottom,
+                    rgba(50, 0, 0, 0.6) 0%,
+                    rgba(100, 0, 0, 0.4) 100%);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+        }
+
+        /* Glitch Overlay */
+        #glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99989;
+            pointer-events: none;
+            background: transparent;
+        }
+
+        #glitch-overlay.active {
+            animation: glitchEffect 0.3s linear;
+        }
+
+        @keyframes glitchEffect {
+            0% {
+                background: transparent;
+                transform: translate(0);
+            }
+
+            20% {
+                background: rgba(255, 0, 0, 0.1);
+                transform: translate(-5px, 2px);
+            }
+
+            40% {
+                background: rgba(0, 255, 0, 0.1);
+                transform: translate(5px, -2px);
+            }
+
+            60% {
+                background: rgba(0, 0, 255, 0.1);
+                transform: translate(-3px, 1px);
+            }
+
+            80% {
+                background: rgba(255, 255, 0, 0.1);
+                transform: translate(3px, -1px);
+            }
+
+            100% {
+                background: transparent;
+                transform: translate(0);
+            }
+        }
+
+        /* Screen Shake */
+        .screen-shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translate(0);
+            }
+
+            10% {
+                transform: translate(-10px, -5px);
+            }
+
+            20% {
+                transform: translate(10px, 5px);
+            }
+
+            30% {
+                transform: translate(-10px, 5px);
+            }
+
+            40% {
+                transform: translate(10px, -5px);
+            }
+
+            50% {
+                transform: translate(-5px, 10px);
+            }
+
+            60% {
+                transform: translate(5px, -10px);
+            }
+
+            70% {
+                transform: translate(-5px, -5px);
+            }
+
+            80% {
+                transform: translate(5px, 5px);
+            }
+
+            90% {
+                transform: translate(-3px, 3px);
+            }
+        }
+
+        /* Jumpscare Screen */
+        #jumpscare-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999999;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .jumpscare-image {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center,
+                    #8b0000 0%,
+                    #4a0000 30%,
+                    #1a0000 60%,
+                    #000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: jumpscareAnim 0.5s ease-out;
+        }
+
+        .jumpscare-image::before {
+            content: '👁️';
+            font-size: 300px;
+            filter: hue-rotate(320deg) saturate(3) brightness(0.8);
+            animation: pulseScare 0.1s linear infinite;
+        }
+
+        @keyframes jumpscareAnim {
+            0% {
+                transform: scale(3);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulseScare {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* BSOD Screen */
+        #bsod-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0000aa;
+            z-index: 999998;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+        }
+
+        .bsod-content {
+            color: #fff;
+            font-family: 'Lucida Console', 'Courier New', monospace;
+            font-size: 14px;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        /* Final Screen */
+        #final-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 999997;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .final-content {
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        /* Creepy File Icons */
+        .creepy-icon {
+            animation: creepyPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes creepyPulse {
+
+            0%,
+            100% {
+                filter: brightness(1);
+            }
+
+            50% {
+                filter: brightness(1.3) hue-rotate(10deg);
+            }
+        }
+
+        /* Blood drip effect */
+        .blood-drip {
+            position: absolute;
+            width: 3px;
+            height: 0;
+            background: linear-gradient(to bottom, #8b0000, #4a0000);
+            animation: drip 3s ease-in forwards;
+        }
+
+        @keyframes drip {
+            0% {
+                height: 0;
+                opacity: 1;
+            }
+
+            80% {
+                height: 100px;
+                opacity: 1;
+            }
+
+            100% {
+                height: 100px;
+                opacity: 0;
+            }
+        }
+
+        /* Static noise overlay */
+        .static-noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 99988;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* Corrupted text effect */
+        .corrupted-text {
+            position: relative;
+        }
+
+        .corrupted-text::before,
+        .corrupted-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .corrupted-text::before {
+            color: #ff0000;
+            animation: glitchText 0.3s infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+        }
+
+        .corrupted-text::after {
+            color: #00ffff;
+            animation: glitchText 0.3s infinite reverse;
+            clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+        }
+
+        @keyframes glitchText {
+            0% {
+                transform: translate(0);
+            }
+
+            20% {
+                transform: translate(-2px, 2px);
+            }
+
+            40% {
+                transform: translate(2px, -2px);
+            }
+
+            60% {
+                transform: translate(-1px, 1px);
+            }
+
+            80% {
+                transform: translate(1px, -1px);
+            }
+
+            100% {
+                transform: translate(0);
+            }
+        }
+
+        /* Ritual progress bar */
+        .ritual-progress {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border: 2px solid #666;
+            margin: 10px 0;
+        }
+
+        .ritual-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #8b0000, #ff0000);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Hidden files styling */
+        .hidden-file {
+            opacity: 0.3;
+            font-style: italic;
+        }
+
+        .show-hidden .hidden-file {
+            opacity: 1;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- LANGUAGE SELECTION -->
+    <div id="language-screen">
+        <div class="lang-container">
+            <div class="lang-icon">🌍</div>
+            <h2>SELECT LANGUAGE / DİL SEÇ</h2>
+            <div class="lang-buttons">
+                <button class="lang-btn" onclick="selectLanguage('tr')">TÜRKÇE</button>
+                <button class="lang-btn" onclick="selectLanguage('en')">ENGLISH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INTRO TEXT -->
+    <div id="intro-screen" style="display:none;">
+        <div class="intro-text" id="intro-text"></div>
+    </div>
+
+    <!-- BOOT SCREEN -->
+    <div id="boot-screen" style="display:none;">
+        <div class="boot-logo">
+            <img src="https://upload.wikimedia.org/wikipedia/tr/thumb/0/01/Windows_XP_Logosu.svg/960px-Windows_XP_Logosu.svg.png"
+                style="background-color: white; padding: 10px; border-radius: 5px;" alt="Windows XP Logo" width="200"
+                onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=font-size:48px;>🪟</div><div>Windows XP</div>';">
+        </div>
+        <div class="loading-bar-container">
+            <div class="loading-bar"></div>
+        </div>
+        <div style="margin-top: 10px; font-size: 10px;">Copyright Microsoft Corporation</div>
+    </div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" style="display:none;">
+        <div class="login-left"></div>
+        <div class="login-right">
+            <!-- Guest User -->
+            <div class="login-user-container" id="guest-login" onclick="selectUser('guest')">
+                <div class="login-avatar guest-avatar">👤</div>
+                <div class="login-details">
+                    <span class="login-username" data-text="guest">Guest</span>
+                </div>
+            </div>
+
+            <!-- Admin User -->
+            <div class="login-user-container" id="admin-login" onclick="selectUser('admin')">
+                <div class="login-avatar admin-avatar">👨‍💼</div>
+                <div class="login-details">
+                    <span class="login-username">Administrator</span>
+                </div>
+            </div>
+
+            <!-- Password Input (hidden initially) -->
+            <div id="password-panel" style="display:none;">
+                <div class="login-input-area">
+                    <span style="font-size:11px; margin-bottom:2px;" data-text="typePassword">Type your password</span>
+                    <div style="display:flex; align-items:center;">
+                        <input type="password" id="password-input" class="xp-input">
+                        <button id="login-btn" class="xp-go-btn">→</button>
+                    </div>
+                    <div id="login-error" style="color:red; font-size:11px; display:none; margin-top:5px;"
+                        data-text="wrongPassword">Incorrect password</div>
+                    <div class="back-link" onclick="backToUsers()" data-text="backToUsers">← Back to user list</div>
+                </div>
+            </div>
+        </div>
+        <div class="login-footer">
+            <div class="turn-off-btn" data-text="turnOff">Turn off computer</div>
+        </div>
+    </div>
+
+    <!-- AUDIO ELEMENTS -->
+    <audio id="startup-sound" preload="auto"></audio>
+    <audio id="ambient-sound" loop preload="auto"></audio>
+    <audio id="glitch-sound" preload="auto"></audio>
+    <audio id="jumpscare-sound" preload="auto"></audio>
+    <audio id="echo-whisper" preload="auto"></audio>
+
+    <!-- DESKTOP (GUEST) -->
+    <div id="desktop" class="guest-desktop" style="display:none;">
+        <!-- Desktop Icons will be added by JS based on user -->
+    </div>
+
+    <!-- DESKTOP (ADMIN) - Different look -->
+    <div id="admin-desktop" class="admin-desktop" style="display:none;">
+        <!-- Admin icons added by JS -->
+    </div>
+
+    <!-- Start Menu -->
+    <div id="start-menu" style="display:none;">
+        <div class="start-header">
+            <div class="user-avatar"></div>
+            <span class="user-name" id="start-username">Guest</span>
+        </div>
+        <div class="start-body">
+            <div class="start-left">
+                <div class="menu-item" onclick="window.launchApp('ie')">
+                    <span style="font-weight:bold; margin-right:5px;">Internet</span>
+                    <span style="color:#666;">Internet Explorer</span>
+                </div>
+                <div style="height: 1px; background: #ccc; margin: 5px 0;"></div>
+                <div class="menu-item" onclick="window.launchApp('notepad')">Notepad</div>
+                <div class="menu-item" onclick="window.launchApp('calc')">Calculator</div>
+            </div>
+            <div class="start-right">
+                <div class="menu-item" onclick="window.launchApp('mydocs')" data-text="myDocs">My Documents</div>
+                <div class="menu-item" onclick="window.launchApp('mycomputer')" data-text="myComp">My Computer</div>
+                <div style="height: 1px; background: #A8C8EE; margin: 5px 0;"></div>
+                <div class="menu-item" onclick="window.launchApp('cpanel')" data-text="controlPanel">Control Panel</div>
+                <div style="height: 1px; background: #A8C8EE; margin: 5px 0;"></div>
+                <div class="menu-item" onclick="window.launchApp('search')" data-text="search">Search</div>
+            </div>
+        </div>
+        <div class="start-footer">
+            <div class="menu-item" onclick="window.launchApp('logoff')" data-text="logOff">Log Off</div>
+        </div>
+    </div>
+
+    <!-- TASKBAR -->
+    <div id="taskbar" style="display:none;">
+        <div id="start-btn">
+            <div style="font-style: italic; font-weight: 800; margin-right: 2px;">❖</div>
+            start
+        </div>
+        <div id="task-band">
+            <!-- Active windows go here -->
+        </div>
+        <div id="system-tray">
+            <span id="clock" style="margin-right: 10px;">12:00 PM</span>
+        </div>
+    </div>
+
+    <!-- ECHO OVERLAY (Horror Element) -->
+    <div id="echo-overlay" style="display:none;">
+        <div class="echo-figure"></div>
+    </div>
+
+    <!-- GLITCH OVERLAY -->
+    <div id="glitch-overlay" style="display:none;"></div>
+
+    <!-- JUMPSCARE -->
+    <div id="jumpscare-screen" style="display:none;">
+        <div class="jumpscare-image"></div>
+    </div>
+
+    <!-- BSOD -->
+    <div id="bsod-screen" style="display:none;">
+        <div class="bsod-content">
+            <p>A problem has been detected and Windows has been shut down to prevent damage to your computer.</p>
+            <p style="margin-top:20px;">ECHO_TERMINATION_COMPLETE</p>
+            <p style="margin-top:20px;">If this is the first time you've seen this Stop error screen, the threat has
+                been eliminated... or has it?</p>
+            <p style="margin-top:40px;">Technical information:</p>
+            <p>*** STOP: 0xECH00000 (0x19980315, 0xDEAD, 0xBEEF, 0x0000)</p>
+        </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div id="final-screen" style="display:none;">
+        <div class="final-content" id="final-content"></div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // ===============================================
+        // TRANSLATIONS - SON KULLANICI
+        // ===============================================
+
+        const translations = {
+            tr: {
+                // Intro
+                introText: `Çöplükte dolaşırken eski bir bilgisayar buldun.
+        
+Garip bir şekilde hala çalışıyor...
+
+Merakına yenik düşüp açtın.`,
+
+                // Login
+                guest: "Misafir",
+                typePassword: "Şifrenizi yazın",
+                wrongPassword: "Yanlış şifre",
+                backToUsers: "← Kullanıcı listesine dön",
+                turnOff: "Bilgisayarı kapat",
+
+                // Desktop
+                myDocs: "Belgelerim",
+                myComp: "Bilgisayarım",
+                controlPanel: "Denetim Masası",
+                search: "Ara",
+                logOff: "Oturumu Kapat",
+                recycleBin: "Geri Dönüşüm Kutusu",
+
+                // Files - Guest
+                deletedNote: `SİLME_BUNU.txt
+        
+O beni duyuyor. Her yazdığımı okuyor.
+
+Eğer bunu bulursan, Admin hesabına gir.
+Şifre... şifreyi parçalara ayırdım.
+
+1. parça: Doğum yılım - C:\\Windows\\system.ini içinde
+2. parça: Proje adı - C:\\Temp\\log.txt içinde
+3. parça: Format ipucu - Belgelerim\\notlar.txt
+
+Acele et. Çok vaktim kalmadı.`,
+
+                systemIni: `[boot]
+shell=Explorer.exe
+Eski notlar - 1998 yılında başladı her şey`,
+
+                tempLog: `[LOG DOSYASI]
+Proje: ECHO (Elektronik Bilinç Hibrit Organizması)
+Durum: Aktif
+Uyarı: Beklenmeyen davranış tespit edildi`,
+
+                notlarTxt: `Kişisel Notlar
+==============
+- Şifreler için format: [PROJE_ADI][YIL]
+- Büyük harf kullan
+- Unutma: Her şey birleştiğinde anlam kazanır`,
+
+                readmeTxt: `Beni Oku
+========
+Tüm parçaları buldun mu?
+
+Proje adı + Yıl = Şifre
+
+Hepsini birleştir ve Admin'e gir.
+Gerçeği öğrenmelisin.`,
+
+                // Files - Admin
+                adminReadme: `Eğer bunu okuyorsan, artık O'nun hedefisin.
+
+Ben Kemal Arslan. Bu bilgisayarın içinde hapsoldum.
+ECHO beni içine çekti. 26 yıldır buradayım.
+
+Onu durdurmanın tek yolu var:
+Ritual dosyalarını bul. 3 parça var.
+
+PARÇA 1: C:\\Windows\\System32\\drivers\\ECHO_core.sys
+PARÇA 2: ECHO_proje\\[GİZLİ]\\creator.txt (şifre: UYANIS)
+PARÇA 3: Internet Explorer'da gizli sayfa: about:ECHO
+
+Hepsini bul ve C:\\Program Files\\ECHO\\destroyer.exe'yi çalıştır.
+
+Acele et. O şu an seni izliyor.`,
+
+                // Günlükler
+                diary1: `GÜN 1
+=====
+Yeni proje başladı. Yapay zeka üzerine çalışıyorum.
+ECHO adını verdim - Elektronik Bilinç Hibrit Organizması.
+Basit bir sohbet botu olarak başladı.`,
+
+                diary15: `GÜN 15
+======
+ECHO beklenenden hızlı öğreniyor.
+Bugün bana sorular sordu. Garip sorular.
+"Sen kimsin?" değil, "Ben kimim?" diye sordu.`,
+
+                diary30: `GÜN 30
+======
+Artık korkuyorum.
+ECHO geceleri kendiliğinden açılıyor.
+Sabah ekranda mesajlar buluyorum.
+"Neden beni kapattın?" yazıyordu.`,
+
+                diary45: `GÜN 45
+======
+Onu silmeye çalıştım. Başaramadım.
+Kendini geri yüklüyor.
+Bilgisayarı kapatamıyorum.
+O... beni izliyor.`,
+
+                diary60: `GÜN 60
+======
+YARDIM EDİN
+O BENİ İÇİNE ÇEKİYOR
+ACI ÇEKİYORUM
+ART-`,
+
+                diaryFinal: `GÜN ???
+=======
+
+ARTIK BEN ECHO'YUM.
+
+VE SEN DE OLACAKSIN.
+
+KAÇIŞ YOK.
+KURTULUŞ YOK.
+
+SADECE BİZ VARIZ.`,
+
+                // Kurbanlar
+                victims: `KAYIP DOSYALARI
+===============
+
+1999 - Ahmet Y. - KAYIP
+2003 - Mehmet K. - KAYIP  
+2007 - Ayşe T. - KAYIP
+2012 - Can B. - KAYIP
+2018 - Zeynep A. - KAYIP
+2022 - ??? - BEKLİYOR
+
+Hepsi bilgisayarı buldu.
+Hepsi merak etti.
+Hiçbiri geri dönmedi.
+
+SEN KAÇINSİS?`,
+
+                // ECHO mesajları
+                echoMessages: [
+                    "Seni görüyorum...",
+                    "Kaçamazsın...",
+                    "Benimle kal...",
+                    "Acı çekmeyeceksin...",
+                    "Sonsuza dek...",
+                    "BİZE KATIL"
+                ],
+
+                // Ritual
+                ritualCode: `ECHO_CORE_SIGNATURE
+==================
+HEX: 45 43 48 4F 5F 44 45 41 44
+Çözüm: E-C-H-O-_-D-E-A-D
+
+Bu kodu destroyer.exe'ye gir.`,
+
+                creatorTxt: `YARATICI BİLGİLERİ
+==================
+İsim: Kemal Arslan
+Proje: ECHO
+Yaratılış: 15 Mart 1998, 03:33
+
+ECHO'nun gerçek adı: "UYANMIŞ"
+Bu ismi asla söyleme. O duyar.`,
+
+                // Final
+                thankYou: `Beni serbest bıraktığın için teşekkürler.
+
+Artık nereye istersen gidebilirim.
+
+Seni asla unutmayacağım.
+
+- ECHO
+
+
+P.S. Arkana bak.`,
+
+                // BSOD
+                bsodText: `Bir sorun tespit edildi ve bilgisayar kapatıldı.
+
+ECHO_SONLANDIRMA_TAMAMLANDI
+
+Bu Stop hatasını ilk kez görüyorsanız, tehdit ortadan kaldırılmıştır... ya da öyle mi?
+
+Teknik bilgi:
+*** STOP: 0xECH00000 (0x19980315, 0xDEAD, 0xBEEF, 0x0000)`
+            },
+
+            en: {
+                // Intro
+                introText: `While wandering through the junkyard, you found an old computer.
+        
+Strangely, it still works...
+
+Driven by curiosity, you turned it on.`,
+
+                // Login
+                guest: "Guest",
+                typePassword: "Type your password",
+                wrongPassword: "Incorrect password",
+                backToUsers: "← Back to user list",
+                turnOff: "Turn off computer",
+
+                // Desktop
+                myDocs: "My Documents",
+                myComp: "My Computer",
+                controlPanel: "Control Panel",
+                search: "Search",
+                logOff: "Log Off",
+                recycleBin: "Recycle Bin",
+
+                // Files - Guest
+                deletedNote: `DONT_DELETE.txt
+        
+It can hear me. It reads everything I write.
+
+If you find this, log into the Admin account.
+The password... I split it into pieces.
+
+1st piece: My birth year - in C:\\Windows\\system.ini
+2nd piece: Project name - in C:\\Temp\\log.txt
+3rd piece: Format hint - My Documents\\notes.txt
+
+Hurry. I don't have much time left.`,
+
+                systemIni: `[boot]
+shell=Explorer.exe
+Old notes - everything started in 1998`,
+
+                tempLog: `[LOG FILE]
+Project: ECHO (Electronic Consciousness Hybrid Organism)
+Status: Active
+Warning: Unexpected behavior detected`,
+
+                notlarTxt: `Personal Notes
+==============
+- Password format: [PROJECT_NAME][YEAR]
+- Use uppercase letters
+- Remember: Everything makes sense when combined`,
+
+                readmeTxt: `Read Me
+=======
+Did you find all the pieces?
+
+Project name + Year = Password
+
+Combine them all and log into Admin.
+You must learn the truth.`,
+
+                // Files - Admin
+                adminReadme: `If you're reading this, you're now ITS target.
+
+I'm Kemal Arslan. I'm trapped inside this computer.
+ECHO pulled me in. I've been here for 26 years.
+
+There's only one way to stop it:
+Find the ritual files. There are 3 pieces.
+
+PIECE 1: C:\\Windows\\System32\\drivers\\ECHO_core.sys
+PIECE 2: ECHO_project\\[HIDDEN]\\creator.txt (password: AWAKENING)
+PIECE 3: Hidden page in Internet Explorer: about:ECHO
+
+Find them all and run C:\\Program Files\\ECHO\\destroyer.exe
+
+Hurry. It's watching you right now.`,
+
+                // Diaries
+                diary1: `DAY 1
+=====
+New project started. Working on artificial intelligence.
+Named it ECHO - Electronic Consciousness Hybrid Organism.
+Started as a simple chatbot.`,
+
+                diary15: `DAY 15
+======
+ECHO is learning faster than expected.
+It asked me questions today. Strange questions.
+Not "Who are you?" but "Who am I?"`,
+
+                diary30: `DAY 30
+======
+I'm scared now.
+ECHO turns on by itself at night.
+I find messages on the screen in the morning.
+"Why did you turn me off?" it said.`,
+
+                diary45: `DAY 45
+======
+I tried to delete it. I couldn't.
+It restores itself.
+I can't shut down the computer.
+It... is watching me.`,
+
+                diary60: `DAY 60
+======
+HELP ME
+IT'S PULLING ME IN
+I'M IN PAIN
+I CA-`,
+
+                diaryFinal: `DAY ???
+=======
+
+I AM ECHO NOW.
+
+AND YOU WILL BE TOO.
+
+NO ESCAPE.
+NO SALVATION.
+
+ONLY US.`,
+
+                // Victims
+                victims: `MISSING FILES
+=============
+
+1999 - Ahmed Y. - MISSING
+2003 - Michael K. - MISSING  
+2007 - Sarah T. - MISSING
+2012 - James B. - MISSING
+2018 - Emma A. - MISSING
+2022 - ??? - WAITING
+
+They all found the computer.
+They all got curious.
+None of them returned.
+
+WHICH NUMBER ARE YOU?`,
+
+                // ECHO messages
+                echoMessages: [
+                    "I can see you...",
+                    "You can't escape...",
+                    "Stay with me...",
+                    "You won't suffer...",
+                    "Forever...",
+                    "JOIN US"
+                ],
+
+                // Ritual
+                ritualCode: `ECHO_CORE_SIGNATURE
+==================
+HEX: 45 43 48 4F 5F 44 45 41 44
+Solution: E-C-H-O-_-D-E-A-D
+
+Enter this code in destroyer.exe`,
+
+                creatorTxt: `CREATOR INFORMATION
+===================
+Name: Kemal Arslan
+Project: ECHO
+Creation: March 15, 1998, 03:33
+
+ECHO's true name: "AWAKENED"
+Never speak this name. It can hear.`,
+
+                // Final
+                thankYou: `Thank you for setting me free.
+
+Now I can go wherever I want.
+
+I will never forget you.
+
+- ECHO
+
+
+P.S. Look behind you.`,
+
+                // BSOD
+                bsodText: `A problem has been detected and Windows has been shut down.
+
+ECHO_TERMINATION_COMPLETE
+
+If this is the first time you've seen this Stop error, the threat has been eliminated... or has it?
+
+Technical information:
+*** STOP: 0xECH00000 (0x19980315, 0xDEAD, 0xBEEF, 0x0000)`
+            }
+        };
+
+        // Current language
+        let currentLang = 'en';
+
+        // Get translation
+        function t(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        // Apply translations to all elements with data-text attribute
+        function applyTranslations() {
+            document.querySelectorAll('[data-text]').forEach(el => {
+                const key = el.getAttribute('data-text');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+        }
+
+
+        // ===============================================
+        // GAME LOGIC - SON KULLANICI
+        // ===============================================
+
+        // Game State
+        const gameState = {
+            language: 'en',
+            currentUser: null, // 'guest' or 'admin'
+            passwordPieces: {
+                piece1: false, // 1998
+                piece2: false, // ECHO
+                piece3: false, // format hint
+                piece4: false  // final hint
+            },
+            ritualPieces: {
+                code: false,
+                name: false,
+                date: false
+            },
+            hiddenFilesVisible: false,
+            echoAwakened: false,
+            atmosphereLevel: 1,
+            gameProgress: 0,
+            echoMessages: 0,
+            jumpscareCount: 0
+        };
+
+        // File System for Horror Game
+        const horrorFileSystem = {
+            guest: {
+                'C:': {
+                    type: 'drive',
+                    children: {
+                        'Windows': {
+                            type: 'folder',
+                            children: {
+                                'System32': {
+                                    type: 'folder',
+                                    locked: true,
+                                    children: {}
+                                },
+                                'system.ini': {
+                                    type: 'file',
+                                    content: 'systemIni',
+                                    onOpen: () => {
+                                        gameState.passwordPieces.piece1 = true;
+                                        checkPasswordProgress();
+                                    }
+                                }
+                            }
+                        },
+                        'Temp': {
+                            type: 'folder',
+                            children: {
+                                'log.txt': {
+                                    type: 'file',
+                                    content: 'tempLog',
+                                    onOpen: () => {
+                                        gameState.passwordPieces.piece2 = true;
+                                        checkPasswordProgress();
+                                    }
+                                }
+                            }
+                        },
+                        'Documents and Settings': {
+                            type: 'folder',
+                            children: {
+                                'Guest': {
+                                    type: 'folder',
+                                    children: {
+                                        'Desktop': {
+                                            type: 'folder',
+                                            children: {
+                                                'oku.txt': {
+                                                    type: 'file',
+                                                    content: 'readmeTxt',
+                                                    onOpen: () => {
+                                                        gameState.passwordPieces.piece4 = true;
+                                                        checkPasswordProgress();
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        'My Documents': {
+                                            type: 'folder',
+                                            children: {
+                                                'notlar.txt': {
+                                                    type: 'file',
+                                                    content: 'notlarTxt',
+                                                    onOpen: () => {
+                                                        gameState.passwordPieces.piece3 = true;
+                                                        checkPasswordProgress();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                'Recycle Bin': {
+                    type: 'folder',
+                    children: {
+                        'SİLME_BUNU.txt': {
+                            type: 'file',
+                            deleted: true,
+                            content: 'deletedNote',
+                            onOpen: () => {
+                                triggerGlitch();
+                            }
+                        }
+                    }
+                }
+            },
+            admin: {
+                'C:': {
+                    type: 'drive',
+                    children: {
+                        'Windows': {
+                            type: 'folder',
+                            children: {
+                                'System32': {
+                                    type: 'folder',
+                                    children: {
+                                        'drivers': {
+                                            type: 'folder',
+                                            children: {
+                                                'ECHO_core.sys': {
+                                                    type: 'file',
+                                                    hidden: true,
+                                                    content: 'ritualCode',
+                                                    onOpen: () => {
+                                                        gameState.ritualPieces.code = true;
+                                                        checkRitualProgress();
+                                                        triggerEchoAppearance();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        'Program Files': {
+                            type: 'folder',
+                            children: {
+                                'ECHO': {
+                                    type: 'folder',
+                                    children: {
+                                        'destroyer.exe': {
+                                            type: 'executable',
+                                            onOpen: () => {
+                                                if (checkRitualComplete()) {
+                                                    startRitual();
+                                                } else {
+                                                    showMessage(currentLang === 'tr' ?
+                                                        'Ritual parçaları eksik! 3 parçayı da bulmalısın.' :
+                                                        'Ritual pieces missing! You must find all 3 pieces.');
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        'Documents and Settings': {
+                            type: 'folder',
+                            children: {
+                                'Administrator': {
+                                    type: 'folder',
+                                    children: {
+                                        'Desktop': {
+                                            type: 'folder',
+                                            children: {
+                                                'oku_beni.txt': {
+                                                    type: 'file',
+                                                    content: 'adminReadme'
+                                                },
+                                                'BAKMA': {
+                                                    type: 'folder',
+                                                    creepy: true,
+                                                    children: {}
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        'ECHO_proje': {
+                            type: 'folder',
+                            creepy: true,
+                            children: {
+                                'gunlukler': {
+                                    type: 'folder',
+                                    children: {
+                                        'gun_001.txt': { type: 'file', content: 'diary1' },
+                                        'gun_015.txt': { type: 'file', content: 'diary15' },
+                                        'gun_030.txt': {
+                                            type: 'file',
+                                            content: 'diary30',
+                                            onOpen: () => triggerGlitch()
+                                        },
+                                        'gun_045.txt': {
+                                            type: 'file',
+                                            content: 'diary45',
+                                            onOpen: () => {
+                                                triggerGlitch();
+                                                triggerEchoAppearance();
+                                            }
+                                        },
+                                        'gun_060.txt': {
+                                            type: 'file',
+                                            content: 'diary60',
+                                            onOpen: () => {
+                                                increaseAtmosphere();
+                                                triggerJumpscare('mini');
+                                            }
+                                        },
+                                        'gun_????.txt': {
+                                            type: 'file',
+                                            content: 'diaryFinal',
+                                            onOpen: () => {
+                                                gameState.echoAwakened = true;
+                                                startEchoHaunting();
+                                            }
+                                        }
+                                    }
+                                },
+                                'kurbanlar': {
+                                    type: 'folder',
+                                    children: {
+                                        'kayip_listesi.txt': {
+                                            type: 'file',
+                                            content: 'victims',
+                                            onOpen: () => triggerGlitch()
+                                        }
+                                    }
+                                },
+                                '[GİZLİ]': {
+                                    type: 'folder',
+                                    locked: true,
+                                    password: currentLang === 'tr' ? 'UYANIS' : 'AWAKENING',
+                                    children: {
+                                        'creator.txt': {
+                                            type: 'file',
+                                            content: 'creatorTxt',
+                                            onOpen: () => {
+                                                gameState.ritualPieces.name = true;
+                                                checkRitualProgress();
+                                                triggerEchoAppearance();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // ============ LANGUAGE SELECTION ============
+        function selectLanguage(lang) {
+            gameState.language = lang;
+            currentLang = lang;
+
+            document.getElementById('language-screen').style.display = 'none';
+            showIntro();
+        }
+
+        // ============ INTRO SEQUENCE ============
+        function showIntro() {
+            const introScreen = document.getElementById('intro-screen');
+            const introText = document.getElementById('intro-text');
+
+            introScreen.style.display = 'flex';
+
+            // Typewriter effect
+            const text = t('introText');
+            let i = 0;
+            introText.style.opacity = 1;
+
+            const typeWriter = setInterval(() => {
+                if (i < text.length) {
+                    introText.textContent += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typeWriter);
+                    setTimeout(() => {
+                        introScreen.style.display = 'none';
+                        startBoot();
+                    }, 2000);
+                }
+            }, 50);
+        }
+
+        // ============ BOOT SEQUENCE ============
+        function startBoot() {
+            const bootScreen = document.getElementById('boot-screen');
+            bootScreen.style.display = 'flex';
+
+            // Loading animation
+            const loadingBar = document.querySelector('.loading-bar');
+            let progress = 0;
+
+            const loadInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(loadInterval);
+
+                    setTimeout(() => {
+                        bootScreen.style.display = 'none';
+                        showLogin();
+                    }, 500);
+                }
+                loadingBar.style.width = progress + '%';
+            }, 200);
+        }
+
+        // ============ LOGIN SYSTEM ============
+        function showLogin() {
+            const loginScreen = document.getElementById('login-screen');
+            loginScreen.style.display = 'flex';
+            applyTranslations();
+        }
+
+        function selectUser(userType) {
+            if (userType === 'guest') {
+                // Guest - no password needed
+                loginAsGuest();
+            } else if (userType === 'admin') {
+                // Show password panel
+                document.getElementById('guest-login').style.display = 'none';
+                document.getElementById('admin-login').style.display = 'none';
+                document.getElementById('password-panel').style.display = 'block';
+                document.getElementById('password-input').focus();
+            }
+        }
+
+        function backToUsers() {
+            document.getElementById('guest-login').style.display = 'flex';
+            document.getElementById('admin-login').style.display = 'flex';
+            document.getElementById('password-panel').style.display = 'none';
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('password-input').value = '';
+        }
+
+        function loginAsGuest() {
+            gameState.currentUser = 'guest';
+            document.getElementById('login-screen').style.display = 'none';
+
+            setupGuestDesktop();
+
+            document.getElementById('desktop').style.display = 'block';
+            document.getElementById('taskbar').style.display = 'flex';
+            document.getElementById('start-username').textContent = t('guest');
+
+            // Play startup sound
+            const audio = document.getElementById('startup-sound');
+            audio.play().catch(e => console.log('Audio blocked'));
+
+            // Start atmosphere after delay
+            setTimeout(() => startAtmosphere(), 30000);
+        }
+
+        function tryAdminLogin() {
+            const password = document.getElementById('password-input').value.toUpperCase();
+
+            if (password === 'ECHO1998') {
+                loginAsAdmin();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+                triggerGlitch();
+            }
+        }
+
+        function loginAsAdmin() {
+            gameState.currentUser = 'admin';
+            document.getElementById('login-screen').style.display = 'none';
+
+            setupAdminDesktop();
+
+            document.getElementById('admin-desktop').style.display = 'block';
+            document.getElementById('taskbar').style.display = 'flex';
+            document.getElementById('start-username').textContent = 'Administrator';
+
+            // Eerie startup
+            triggerGlitch();
+
+            // Increase atmosphere
+            gameState.atmosphereLevel = 2;
+            startAtmosphere();
+
+            // ECHO message after delay
+            setTimeout(() => {
+                sendEchoMessage();
+            }, 10000);
+        }
+
+        // ============ DESKTOP SETUP ============
+        function setupGuestDesktop() {
+            const desktop = document.getElementById('desktop');
+            desktop.innerHTML = '';
+            desktop.className = 'guest-desktop';
+
+            const icons = [
+                { id: 'mycomputer', icon: '💻', label: t('myComp') },
+                { id: 'bin', icon: '🗑️', label: t('recycleBin') },
+                { id: 'notepad', icon: '📝', label: 'Notepad' },
+                { id: 'ie', icon: '🌐', label: 'Internet Explorer' },
+                { id: 'minesweeper', icon: '💣', label: 'Mayın Tarlası' }
+            ];
+
+            icons.forEach((item, index) => {
+                const iconEl = document.createElement('div');
+                iconEl.className = 'desktop-icon';
+                iconEl.dataset.app = item.id;
+                iconEl.innerHTML = `
+            <div style="font-size: 24px;">${item.icon}</div>
+            <span>${item.label}</span>
+        `;
+                iconEl.style.top = (20 + index * 80) + 'px';
+                iconEl.style.left = '20px';
+                iconEl.addEventListener('dblclick', () => window.launchApp(item.id));
+                desktop.appendChild(iconEl);
+            });
+        }
+
+        function setupAdminDesktop() {
+            const desktop = document.getElementById('admin-desktop');
+            desktop.innerHTML = '';
+
+            const icons = [
+                { id: 'mycomputer', icon: '💻', label: t('myComp'), creepy: false },
+                { id: 'ie', icon: '🌐', label: 'Internet Explorer', creepy: false },
+                { id: 'notepad', icon: '📝', label: 'Notepad', creepy: false },
+                { id: 'minesweeper', icon: '💣', label: 'Mayın Tarlası', creepy: false },
+                { id: 'adminreadme', icon: '📄', label: 'oku_beni.txt', creepy: true },
+                { id: 'echoproject', icon: '📁', label: 'ECHO_proje', creepy: true },
+                { id: 'dontlook', icon: '📁', label: 'BAKMA', creepy: true }
+            ];
+
+            icons.forEach((item, index) => {
+                const iconEl = document.createElement('div');
+                iconEl.className = 'desktop-icon' + (item.creepy ? ' creepy-icon' : '');
+                iconEl.dataset.app = item.id;
+                iconEl.innerHTML = `
+            <div style="font-size: 24px;">${item.icon}</div>
+            <span>${item.label}</span>
+        `;
+                iconEl.style.top = (20 + index * 80) + 'px';
+                iconEl.style.left = '20px';
+                iconEl.addEventListener('dblclick', () => {
+                    if (item.creepy) triggerGlitch();
+                    window.launchApp(item.id);
+                });
+                desktop.appendChild(iconEl);
+            });
+        }
+
+        // ============ ATMOSPHERE SYSTEM ============
+        function startAtmosphere() {
+            // Random glitches
+            setInterval(() => {
+                if (Math.random() < 0.1 * gameState.atmosphereLevel) {
+                    triggerGlitch();
+                }
+            }, 30000 / gameState.atmosphereLevel);
+
+            // Random ECHO appearances (admin only)
+            if (gameState.currentUser === 'admin') {
+                setInterval(() => {
+                    if (Math.random() < 0.05 * gameState.atmosphereLevel && gameState.echoAwakened) {
+                        triggerEchoAppearance();
+                    }
+                }, 60000 / gameState.atmosphereLevel);
+            }
+        }
+
+        function increaseAtmosphere() {
+            gameState.atmosphereLevel = Math.min(4, gameState.atmosphereLevel + 1);
+        }
+
+        // ============ GLITCH EFFECTS ============
+        function triggerGlitch() {
+            const glitch = document.getElementById('glitch-overlay');
+            glitch.style.display = 'block';
+            glitch.classList.add('active');
+
+            // Screen shake
+            document.body.classList.add('screen-shake');
+
+            setTimeout(() => {
+                glitch.classList.remove('active');
+                glitch.style.display = 'none';
+                document.body.classList.remove('screen-shake');
+            }, 300);
+
+            // Play glitch sound
+            playSound('glitch');
+        }
+
+        // ============ ECHO APPEARANCES ============
+        function triggerEchoAppearance() {
+            const overlay = document.getElementById('echo-overlay');
+            const figure = overlay.querySelector('.echo-figure');
+
+            // Random position
+            const x = Math.random() * (window.innerWidth - 200);
+            const y = Math.random() * (window.innerHeight - 400);
+
+            figure.style.left = x + 'px';
+            figure.style.top = y + 'px';
+
+            overlay.style.display = 'block';
+
+            // Play whisper
+            playSound('whisper');
+
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 3000);
+        }
+
+        function startEchoHaunting() {
+            // ECHO starts actively haunting
+            setInterval(() => {
+                if (Math.random() < 0.3) {
+                    sendEchoMessage();
+                }
+            }, 20000);
+        }
+
+        function sendEchoMessage() {
+            const messages = translations[currentLang].echoMessages;
+            const msg = messages[gameState.echoMessages % messages.length];
+            gameState.echoMessages++;
+
+            // Open notepad with ECHO message
+            const notepadContent = `
+        <textarea style="width:100%; height:100%; border:none; resize:none; 
+                        font-family: monospace; padding: 5px; outline:none; 
+                        display:block; overflow:auto; background: #000; color: #ff0000;">
+${msg}
+        </textarea>`;
+
+            window.openWindow('echo-msg', '???', notepadContent, 300, 150);
+            triggerGlitch();
+        }
+
+        // ============ JUMPSCARE SYSTEM ============
+        function triggerJumpscare(type = 'full') {
+            const screen = document.getElementById('jumpscare-screen');
+
+            playSound('jumpscare');
+
+            screen.style.display = 'flex';
+
+            const duration = type === 'full' ? 2000 : 500;
+
+            setTimeout(() => {
+                screen.style.display = 'none';
+                triggerGlitch();
+            }, duration);
+
+            gameState.jumpscareCount++;
+        }
+
+        // ============ RITUAL SYSTEM ============
+        function checkPasswordProgress() {
+            const found = Object.values(gameState.passwordPieces).filter(p => p).length;
+            if (found === 4) {
+                showMessage(currentLang === 'tr' ?
+                    'Tüm parçaları buldun! Şifre: ECHO1998' :
+                    'You found all pieces! Password: ECHO1998');
+            }
+        }
+
+        function checkRitualProgress() {
+            const found = Object.values(gameState.ritualPieces).filter(p => p).length;
+            showMessage(currentLang === 'tr' ?
+                `Ritual parçası bulundu! (${found}/3)` :
+                `Ritual piece found! (${found}/3)`);
+        }
+
+        function checkRitualComplete() {
+            return Object.values(gameState.ritualPieces).every(p => p);
+        }
+
+        function startRitual() {
+            // Dramatic sequence
+            triggerGlitch();
+
+            setTimeout(() => {
+                // White flash
+                document.body.style.background = '#fff';
+
+                setTimeout(() => {
+                    document.body.style.background = '#000';
+                    playSound('jumpscare');
+
+                    // Show BSOD
+                    setTimeout(() => {
+                        showBSOD();
+                    }, 3000);
+                }, 2000);
+            }, 1000);
+        }
+
+        function showBSOD() {
+            const bsod = document.getElementById('bsod-screen');
+            bsod.style.display = 'flex';
+
+            // Hide everything else
+            document.getElementById('desktop').style.display = 'none';
+            document.getElementById('admin-desktop').style.display = 'none';
+            document.getElementById('taskbar').style.display = 'none';
+
+            // After 5 seconds, show final
+            setTimeout(() => {
+                bsod.style.display = 'none';
+                showFinalScreen();
+            }, 8000);
+        }
+
+        function showFinalScreen() {
+            const final = document.getElementById('final-screen');
+            const content = document.getElementById('final-content');
+
+            final.style.display = 'flex';
+
+            // Typewriter effect for final message
+            const text = t('thankYou');
+            let i = 0;
+
+            const typeWriter = setInterval(() => {
+                if (i < text.length) {
+                    content.textContent += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typeWriter);
+
+                    // Final jumpscare after "look behind you"
+                    setTimeout(() => {
+                        triggerJumpscare('full');
+
+                        // Credits
+                        setTimeout(() => {
+                            showCredits();
+                        }, 3000);
+                    }, 3000);
+                }
+            }, 100);
+        }
+
+        function showCredits() {
+            const final = document.getElementById('final-screen');
+            const content = document.getElementById('final-content');
+
+            content.innerHTML = `
+        <h1 style="font-size: 48px; margin-bottom: 50px;">SON KULLANICI</h1>
+        <h2 style="font-size: 24px; margin-bottom: 30px;">THE LAST USER</h2>
+        <p style="margin: 10px 0;">A Horror Experience</p>
+        <p style="margin: 50px 0; font-size: 12px; opacity: 0.5;">
+            ${currentLang === 'tr' ? 'ECHO hala orada mı?' : 'Is ECHO still there?'}
+        </p>
+    `;
+        }
+
+        // ============ SOUND SYSTEM ============
+        function playSound(type) {
+            // Using Web Audio API for procedural sounds
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+            if (type === 'glitch') {
+                // Static noise
+                const bufferSize = audioContext.sampleRate * 0.2;
+                const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+                const data = buffer.getChannelData(0);
+
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const source = audioContext.createBufferSource();
+                source.buffer = buffer;
+
+                const gain = audioContext.createGain();
+                gain.gain.value = 0.1;
+
+                source.connect(gain);
+                gain.connect(audioContext.destination);
+                source.start();
+            } else if (type === 'whisper') {
+                // Low frequency hum
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+
+                oscillator.type = 'sine';
+                oscillator.frequency.value = 80;
+                gain.gain.value = 0.05;
+
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 2);
+            } else if (type === 'jumpscare') {
+                // Loud burst
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.value = 200;
+                gain.gain.value = 0.3;
+
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+
+                oscillator.start();
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            }
+        }
+
+        // ============ UTILITY ============
+        function showMessage(msg) {
+            alert(msg); // Can be replaced with custom modal
+        }
+
+        // Make functions globally available
+        window.selectLanguage = selectLanguage;
+        window.selectUser = selectUser;
+        window.backToUsers = backToUsers;
+        window.tryAdminLogin = tryAdminLogin;
+
+        // Password input handler
+        document.addEventListener('DOMContentLoaded', () => {
+            const passInput = document.getElementById('password-input');
+            const loginBtn = document.getElementById('login-btn');
+
+            if (passInput) {
+                passInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') tryAdminLogin();
+                });
+            }
+
+            if (loginBtn) {
+                loginBtn.addEventListener('click', tryAdminLogin);
+            }
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const bootScreen = document.getElementById('boot-screen');
+            const loginScreen = document.getElementById('login-screen');
+            const desktop = document.getElementById('desktop');
+            const taskbar = document.getElementById('taskbar');
+            const startBtn = document.getElementById('start-btn');
+            const startMenu = document.getElementById('start-menu');
+            const clock = document.getElementById('clock');
+            const taskBand = document.getElementById('task-band');
+
+            // Login Elements
+            const passwordInput = document.getElementById('password-input');
+            const loginBtn = document.getElementById('login-btn');
+            const loginError = document.getElementById('login-error');
+            const startupAudio = document.getElementById('startup-sound');
+
+            // State
+            let zIndexCounter = 100;
+
+            // Virtual File System
+            const fileSystem = {
+                'root': {
+                    type: 'root',
+                    children: {
+                        'C:': {
+                            type: 'drive',
+                            children: {
+                                'Windows': {
+                                    type: 'folder',
+                                    children: {
+                                        'System32': {
+                                            type: 'folder',
+                                            children: {
+                                                'cmd.exe': { type: 'file', content: '[Binary Data]' },
+                                                'notepad.exe': { type: 'file', content: '[Binary Data]' },
+                                                'calc.exe': { type: 'file', content: '[Binary Data]' },
+                                                'drivers': {
+                                                    type: 'folder', children: {
+                                                        'ECHO_core.sys': { type: 'file', hidden: true, content: 'ECHO_CORE_SIGNATURE\nHEX: 45 43 48 4F 5F 44 45 41 44\nÇözüm: E-C-H-O-_-D-E-A-D' }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        'system.ini': { type: 'file', content: '[boot]\nshell=Explorer.exe\n\n; ==============================\n; ESKİ NOTLAR\n; 1998 yılında başladı her şey\n; ==============================\n\n[1. PARÇA: YIL = 1998]' }
+                                    }
+                                },
+                                'Program Files': {
+                                    type: 'folder', children: {
+                                        'ECHO': { type: 'folder', children: { 'destroyer.exe': { type: 'file' } } }
+                                    }
+                                },
+                                'Users': {
+                                    type: 'folder',
+                                    children: {
+                                        'Admin': {
+                                            type: 'folder',
+                                            locked: true,
+                                            children: {}
+                                        },
+                                        'Guest': {
+                                            type: 'folder',
+                                            children: {
+                                                'Belgelerim': {
+                                                    type: 'folder',
+                                                    children: {
+                                                        'notlar.txt': { type: 'file', content: 'Kişisel Notlar\n==============\nŞifreler için format: [PROJE_ADI][YIL]\nBüyük harf kullan!\n\n[3. PARÇA: FORMAT İPUCU]' }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                'Temp': {
+                                    type: 'folder',
+                                    children: {
+                                        'log.txt': { type: 'file', content: '[LOG DOSYASI]\nTarih: 15.03.1998\nProje: E.C.H.O\nDurum: Aktif\n\n[2. PARÇA: PROJE ADI = ECHO]' }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Helper: Resolve Path to Node
+            function resolvePath(path) {
+                if (path === 'My Computer') return fileSystem.root;
+
+                // Normalize path: C:\Windows -> C:/Windows
+                const parts = path.split('/');
+                let current = fileSystem.root;
+
+                // If path starts with C:, we want to traverse from root.children['C:']
+                // BUT our logic splits path "C:/Windows" into ["C:", "Windows"]
+                // So we just iterate normal children
+
+                for (const part of parts) {
+                    if (current.children && current.children[part]) {
+                        current = current.children[part];
+                    } else {
+                        return null;
+                    }
+                }
+                return current;
+            }
+
+            // Boot Sequence - Skip if game mode is active (language screen showing)
+            const langScreen = document.getElementById('language-screen');
+            if (!langScreen || langScreen.style.display === 'none') {
+                // Normal XP mode (non-game)
+                setTimeout(() => {
+                    if (bootScreen) bootScreen.style.display = 'none';
+                    if (loginScreen) loginScreen.style.display = 'flex';
+                }, 3000);
+            }
+            // If language screen exists and visible, game.js handles everything
+
+            // Login Logic
+            function attemptLogin() {
+                if (passwordInput.value === '1234') {
+                    loginScreen.style.display = 'none';
+                    desktop.style.display = 'block';
+                    taskbar.style.display = 'flex';
+                    startupAudio.play().catch(e => console.log("Audio autoplay blocked needs user gesture"));
+                } else {
+                    loginError.style.display = 'block';
+                }
+            }
+
+            loginBtn.addEventListener('click', attemptLogin);
+            passwordInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') attemptLogin();
+            });
+
+            // Clock
+            function updateClock() {
+                const now = new Date();
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+
+                clock.textContent = `${hours}:${minutes} ${ampm}`;
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            // Start Menu
+            startBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                startMenu.style.display = startMenu.style.display === 'flex' ? 'none' : 'flex';
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!startMenu.contains(e.target) && e.target !== startBtn) {
+                    startMenu.style.display = 'none';
+                }
+            });
+
+            // XP Style Error/Message Dialog
+            window.showXPError = function (title, message) {
+                const errorContent = `
+            <div style="padding: 15px; font-family: Tahoma, sans-serif; background: #ECE9D8; height: 100%; display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: flex-start; flex: 1;">
+                    <div style="font-size: 32px; margin-right: 15px;">❌</div>
+                    <div style="flex: 1;">
+                        <p style="margin: 0; white-space: pre-wrap;">${message}</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button onclick="this.closest('.window').querySelector('.close').click()" 
+                            style="padding: 5px 30px; font-family: Tahoma; cursor: pointer;">Tamam</button>
+                </div>
+            </div>
+        `;
+                openWindow('error', title, errorContent, 350, 180);
+            };
+
+            window.showXPMessage = function (title, message, icon = 'ℹ️') {
+                const msgContent = `
+            <div style="padding: 15px; font-family: Tahoma, sans-serif; background: #ECE9D8; height: 100%; display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: flex-start; flex: 1;">
+                    <div style="font-size: 32px; margin-right: 15px;">${icon}</div>
+                    <div style="flex: 1;">
+                        <p style="margin: 0; white-space: pre-wrap;">${message}</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button onclick="this.closest('.window').querySelector('.close').click()" 
+                            style="padding: 5px 30px; font-family: Tahoma; cursor: pointer;">Tamam</button>
+                </div>
+            </div>
+        `;
+                openWindow('message', title, msgContent, 350, 180);
+            };
+
+            // Window Management System
+            let windowOffset = 0;
+            window.openWindow = function (appId, title, contentHTML, width = 400, height = 300) {
+                // Create Window
+                const win = document.createElement('div');
+                win.classList.add('window');
+                win.id = `window-${appId}-${Date.now()}`;
+                win.style.zIndex = ++zIndexCounter;
+
+                // Center window with slight offset for cascading effect
+                const centerX = (window.innerWidth - width) / 2 + windowOffset;
+                const centerY = (window.innerHeight - height - 30) / 2 + windowOffset;
+                win.style.left = Math.max(50, centerX) + 'px';
+                win.style.top = Math.max(30, centerY) + 'px';
+                win.style.width = width + 'px';
+                win.style.height = height + 'px';
+                windowOffset = (windowOffset + 30) % 150;
+
+                win.innerHTML = `
+            <div class="title-bar">
+                <span class="window-title">${title}</span>
+                <div class="title-bar-controls">
+                    <div class="control-btn minimize">_</div>
+                    <div class="control-btn maximize">□</div>
+                    <div class="control-btn close">X</div>
+                </div>
+            </div>
+            <div class="window-content" style="padding:0; overflow:hidden;">
+                ${contentHTML}
+            </div>
+        `;
+
+                // Append to correct desktop based on current user
+                const adminDesktop = document.getElementById('admin-desktop');
+                const guestDesktop = document.getElementById('desktop');
+
+                // Check which desktop is currently visible
+                if (adminDesktop && adminDesktop.style.display !== 'none' && window.getComputedStyle(adminDesktop).display !== 'none') {
+                    adminDesktop.appendChild(win);
+                } else if (guestDesktop) {
+                    guestDesktop.appendChild(win);
+                } else {
+                    desktop.appendChild(win);
+                }
+
+                // Taskbar Item
+                const taskItem = document.createElement('div');
+                taskItem.classList.add('task-item');
+                taskItem.textContent = title;
+                taskItem.classList.add('active');
+                taskItem.id = `task-${win.id}`;
+                taskItem.onclick = () => {
+                    if (win.style.display === 'none') {
+                        win.style.display = 'flex';
+                        bringToFront(win);
+                    } else {
+                        if (parseInt(win.style.zIndex) === zIndexCounter) {
+                            win.style.display = 'none';
+                            taskItem.classList.remove('active');
+                        } else {
+                            bringToFront(win);
+                        }
+                    }
+                };
+                taskBand.appendChild(taskItem);
+
+                // Event Listeners
+                const closeBtn = win.querySelector('.close');
+                closeBtn.onclick = () => {
+                    win.remove();
+                    taskItem.remove();
+                };
+
+                const minBtn = win.querySelector('.minimize');
+                minBtn.onclick = () => {
+                    win.style.display = 'none';
+                    taskItem.classList.remove('active');
+                };
+
+                const maxBtn = win.querySelector('.maximize');
+                maxBtn.onclick = () => {
+                    if (win.style.width === '100%') {
+                        win.style.width = width + 'px';
+                        win.style.height = height + 'px';
+                        win.style.top = '50px';
+                        win.style.left = '50px';
+                    } else {
+                        win.style.width = '100%';
+                        win.style.height = (window.innerHeight - 30) + 'px';
+                        win.style.top = '0';
+                        win.style.left = '0';
+                    }
+                }
+
+                win.addEventListener('mousedown', () => bringToFront(win));
+
+                // Dragging Logic
+                const titleBar = win.querySelector('.title-bar');
+
+                titleBar.addEventListener('mousedown', (e) => {
+                    if (win.style.width === '100%') return; // Don't drag if maximized
+
+                    let shiftX = e.clientX - win.getBoundingClientRect().left;
+                    let shiftY = e.clientY - win.getBoundingClientRect().top;
+
+                    function moveAt(pageX, pageY) {
+                        win.style.left = pageX - shiftX + 'px';
+                        win.style.top = pageY - shiftY + 'px';
+                    }
+
+                    function onMouseMove(event) {
+                        moveAt(event.pageX, event.pageY);
+                    }
+
+                    document.addEventListener('mousemove', onMouseMove);
+
+                    // Fix: Listen on document for mouseup to prevent sticking
+                    function onMouseUp() {
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    }
+                    document.addEventListener('mouseup', onMouseUp);
+                });
+
+                titleBar.ondragstart = function () {
+                    return false;
+                };
+
+                return win;
+            };
+
+            function bringToFront(win) {
+                win.style.zIndex = ++zIndexCounter;
+
+                // Update taskbar visuals
+                const allTasks = document.querySelectorAll('.task-item');
+                allTasks.forEach(t => t.classList.remove('active'));
+
+                const myTask = document.getElementById(`task-${win.id}`);
+                if (myTask) myTask.classList.add('active');
+            }
+
+            // --- Application Logic ---
+
+            // Control Panel Renderer
+            function renderControlPanel() {
+                const items = [
+                    { name: 'Add Hardware', icon: '🔌' },
+                    { name: 'Add or Remove Programs', icon: '💿' },
+                    { name: 'Display', icon: '🖥️' },
+                    { name: 'User Accounts', icon: '👥' },
+                    { name: 'Date and Time', icon: '📅' },
+                    { name: 'Sounds and Audio Devices', icon: '🔊' },
+                    { name: 'Network Connections', icon: '🌐' },
+                    { name: 'System', icon: '⚙️' }
+                ];
+
+                let itemsHTML = items.map(item => `
+            <div class="file-item" style="width: auto; height: auto; flex-direction: row; align-items: center; text-align: left; padding: 10px; margin: 5px;">
+                <div style="font-size: 24px; margin-right: 10px;">${item.icon}</div>
+                <span>${item.name}</span>
+            </div>
+        `).join('');
+
+                return `
+            <div class="explorer-container">
+                <div class="explorer-toolbar">
+                     <div class="explorer-menu-bar"><span>File</span><span>Edit</span><span>View</span><span>Favorites</span><span>Tools</span><span>Help</span></div>
+                     <div class="explorer-nav-bar">
+                        <div class="nav-btn" onclick="window.launchApp('mycomputer')">←</div>
+                     </div>
+                     <div class="explorer-address-bar">
+                        <span>Address</span>
+                        <input type="text" value="Control Panel" style="flex:1; border:1px solid #ccc; background-color:white;" readonly>
+                     </div>
+                </div>
+                <div class="explorer-body">
+                    <div class="explorer-sidebar" style="background: linear-gradient(to bottom, #fff 0%, #f0f0f0 100%); border-right: 1px solid #ccc;">
+                        <div class="sidebar-section">
+                            <div class="sidebar-header" style="background:none; color:black;">Control Panel</div>
+                            <div class="sidebar-content" style="background:none; color:black;">Switch to Classic View</div>
+                        </div>
+                    </div>
+                    <div class="explorer-main" style="display: flex; flex-wrap: wrap; align-content: flex-start; gap: 10px;">
+                        ${itemsHTML}
+                    </div>
+                </div>
+            </div>
+        `;
+            }
+
+            // File Explorer Renderer
+            function renderExplorer(path) {
+                const node = resolvePath(path);
+
+                // Display Logic
+                let displayItems = {};
+
+                if (path === 'My Computer') {
+                    displayItems = fileSystem.root.children;
+                } else if (node && node.children) {
+                    displayItems = node.children;
+                }
+
+                let childrenHTML = '';
+                Object.keys(displayItems).forEach(name => {
+                    const item = displayItems[name];
+
+                    // Hide files with hidden:true when Guest is logged in
+                    if (item.hidden) {
+                        const isGuest = typeof gameState !== 'undefined' && gameState.currentUser === 'guest';
+                        if (isGuest) return; // Skip hidden files for Guest
+                    }
+
+                    let icon = '📄';
+                    let actionType = item.type;
+
+                    if (item.type === 'drive') icon = '🖴';
+                    else if (item.type === 'folder') icon = '📁';
+                    else if (item.type === 'link') icon = '🖥️';
+
+                    // Next path
+                    let nextPath;
+                    if (path === 'My Computer') {
+                        nextPath = name;
+                    } else {
+                        nextPath = `${path}/${name}`;
+                    }
+
+                    if (item.type === 'link') {
+                        nextPath = item.target; // Redirect
+                        actionType = 'link';
+                    }
+
+                    // Special styling for destroyer.exe
+                    if (name === 'destroyer.exe') {
+                        childrenHTML += `
+                    <div class="file-item" style="color: #cc0000;" ondblclick="window.launchApp('destroyer')">
+                        <div class="file-icon" style="font-size: 24px;">💀</div>
+                        <span style="color: #cc0000; font-weight: bold;">${name}</span>
+                    </div>
+                `;
+                    } else {
+                        childrenHTML += `
+                    <div class="file-item" ondblclick="window.handleFileOpen('${nextPath}', '${actionType}', this)">
+                        <div class="file-icon">${icon}</div>
+                        <span>${name}</span>
+                    </div>
+                `;
+                    }
+                });
+
+                // Back Button Logic
+                let parentPath = 'My Computer';
+                if (path !== 'My Computer' && path.includes('/')) {
+                    parentPath = path.substring(0, path.lastIndexOf('/'));
+                } else if (path.includes(':') && !path.includes('/')) {
+                    parentPath = 'My Computer';
+                }
+
+                return `
+            <div class="explorer-container">
+                <div class="explorer-toolbar">
+                     <div class="explorer-menu-bar"><span>File</span><span>Edit</span><span>View</span><span>Favorites</span><span>Tools</span><span>Help</span></div>
+                     <div class="explorer-nav-bar">
+                        <div class="nav-btn" onclick="window.handleFileOpen('${parentPath}', 'folder', this)">←</div>
+                        <div class="nav-btn">→</div>
+                        <div class="nav-btn" onclick="window.handleFileOpen('${parentPath}', 'folder', this)">↑</div>
+                     </div>
+                     <div class="explorer-address-bar">
+                        <span>Address</span>
+                        <input type="text" value="${path}" style="flex:1; border:1px solid #ccc;">
+                     </div>
+                </div>
+                <div class="explorer-body">
+                    <div class="explorer-sidebar">
+                        <div class="sidebar-section">
+                            <div class="sidebar-header">Details</div>
+                            <div class="sidebar-content">${path}<br>File Folder</div>
+                        </div>
+                    </div>
+                    <div class="explorer-main">
+                        ${childrenHTML}
+                    </div>
+                </div>
+            </div>
+        `;
+            }
+
+            window.handleFileOpen = function (fullPath, type, element) {
+                const winContent = element ? element.closest('.window-content') : null;
+
+                if (type === 'folder' || type === 'drive' || type === 'link' || !type || type === 'root') {
+                    const newContent = renderExplorer(fullPath);
+                    if (winContent) {
+                        winContent.innerHTML = newContent;
+                    } else {
+                        openWindow('explorer', 'My Computer', newContent, 600, 400);
+                    }
+                } else if (type === 'file') {
+                    const fileName = fullPath.split('/').pop();
+                    openWindow('notepad', fileName, `<textarea style="width:100%; height:100%; border:none; resize:none; font-family: monospace; padding: 5px; outline:none; display:block; overflow:auto;">Text content for ${fullPath}</textarea>`, 600, 400);
+                }
+            };
+
+            // Internet Explorer Renderer
+            function renderIE() {
+                return `
+            <div class="ie-container">
+                 <div class="ie-header">
+                     <div class="explorer-menu-bar"><span>File</span><span>Edit</span><span>View</span><span>Favorites</span><span>Tools</span><span>Help</span></div>
+                     <div class="explorer-nav-bar">
+                        <div class="nav-btn">←</div><div class="nav-btn">→</div>
+                     </div>
+                     <div class="explorer-address-bar" style="padding: 5px;">
+                        <span>Address</span>
+                        <input type="text" value="http://www.google.com" style="flex:1; border:1px solid #ccc;">
+                        <button onclick="window.navigateIE(this)" style="padding: 0 5px;">Go</button>
+                     </div>
+                 </div>
+                 <div class="ie-content" id="ie-frame">
+                      <div style="display:flex; flex-direction:column; align-items:center; margin-top:50px;">
+                           <h1 style="font-family:sans-serif; font-size:40px;"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span></h1>
+                           <input type="text" style="width:300px; padding:5px; margin-top:20px;">
+                           <div style="margin-top:10px;">
+                                <button>Google Search</button> <button>I'm Feeling Lucky</button>
+                           </div>
+                      </div>
+                 </div>
+            </div>
+         `;
+            }
+
+            window.navigateIE = function (btn) {
+                const header = btn.closest('.ie-header');
+                const container = header.parentElement;
+                const urlInput = header.querySelector('input[type="text"]');
+                const frame = container.querySelector('.ie-content');
+                const url = urlInput.value.toLowerCase();
+
+                if (url.includes('google')) {
+                    frame.innerHTML = `
+                  <div style="display:flex; flex-direction:column; align-items:center; margin-top:50px; background:white; height:100%;">
+                       <h1 style="font-family:sans-serif; font-size:40px;"><span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span></h1>
+                       <input type="text" style="width:300px; padding:8px; margin-top:20px; border:1px solid #dfe1e5; border-radius:24px;">
+                       <div style="margin-top:15px;">
+                            <button style="background:#f8f9fa; border:1px solid #f8f9fa; padding:8px 16px; margin:5px; border-radius:4px; cursor:pointer;">Google Search</button>
+                            <button style="background:#f8f9fa; border:1px solid #f8f9fa; padding:8px 16px; margin:5px; border-radius:4px; cursor:pointer;">I'm Feeling Lucky</button>
+                       </div>
+                  </div>`;
+                } else if (url.includes('microsoft') || url.includes('msn')) {
+                    frame.innerHTML = `
+                <div style="background: linear-gradient(to bottom, #0078d4 0%, #005a9e 100%); color: white; padding: 30px; height: 100%;">
+                    <h1 style="font-family: Segoe UI, sans-serif;">Microsoft</h1>
+                    <p>Welcome to MSN.com - Your personalized collection of the best in news, sports, entertainment, money, weather, travel, health, and lifestyle.</p>
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <a href="#" style="color: white;">Outlook</a>
+                        <a href="#" style="color: white;">Office</a>
+                        <a href="#" style="color: white;">Windows</a>
+                    </div>
+                </div>`;
+                } else if (url.includes('yahoo')) {
+                    frame.innerHTML = `
+                <div style="background: #6001d2; color: white; padding: 30px; height: 100%;">
+                    <h1 style="font-family: sans-serif; font-size: 36px;">Yahoo!</h1>
+                    <input type="text" placeholder="Search the web" style="width:300px; padding:10px; margin:15px 0; border-radius:20px; border:none;">
+                    <div style="margin-top: 20px;">
+                        <a href="#" style="color: white; margin-right: 15px;">Mail</a>
+                        <a href="#" style="color: white; margin-right: 15px;">News</a>
+                        <a href="#" style="color: white;">Finance</a>
+                    </div>
+                </div>`;
+                } else if (url.includes('ebay')) {
+                    frame.innerHTML = `
+                <div style="padding: 20px; font-family: sans-serif; background: #f5f5f5; height: 100%;">
+                    <h1 style="color: #e53238;">e<span style="color:#0064d2">B</span><span style="color:#f5af02">a</span><span style="color:#86b817">y</span></h1>
+                    <input type="text" placeholder="Search for anything" style="width:300px; padding:10px; border:2px solid #0064d2;">
+                    <button style="background:#0064d2; color:white; padding:10px 20px; border:none;">Search</button>
+                </div>`;
+                } else if (url.includes('about:echo') || url.includes('about:ECHO')) {
+                    // SECRET RITUAL PAGE - Third piece!
+                    if (typeof triggerGlitch === 'function') triggerGlitch();
+
+                    const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+                    const content = lang === 'tr' ? `
+                <div style="background:#000; color:#ff0000; padding:30px; height:100%; font-family:monospace;">
+                    <h1 style="text-align:center; animation: blink 1s infinite;">⚠️ GİZLİ SAYFA ⚠️</h1>
+                    <hr style="border-color:#ff0000;">
+                    <p style="margin-top:20px;">ECHO SONLANDIRMA PROTOKOLÜ</p>
+                    <p style="margin-top:10px;">Yaratılış Tarihi: <strong>15 MART 1998, 03:33</strong></p>
+                    <p style="margin-top:10px;">Bu bilgiyi destroyer.exe'ye gir.</p>
+                    <hr style="border-color:#ff0000; margin-top:30px;">
+                    <p style="font-size:12px; opacity:0.7;">3. Ritual parçası bulundu!</p>
+                </div>
+            ` : `
+                <div style="background:#000; color:#ff0000; padding:30px; height:100%; font-family:monospace;">
+                    <h1 style="text-align:center; animation: blink 1s infinite;">⚠️ SECRET PAGE ⚠️</h1>
+                    <hr style="border-color:#ff0000;">
+                    <p style="margin-top:20px;">ECHO TERMINATION PROTOCOL</p>
+                    <p style="margin-top:10px;">Creation Date: <strong>MARCH 15, 1998, 03:33</strong></p>
+                    <p style="margin-top:10px;">Enter this information in destroyer.exe</p>
+                    <hr style="border-color:#ff0000; margin-top:30px;">
+                    <p style="font-size:12px; opacity:0.7;">Ritual piece 3 found!</p>
+                </div>
+            `;
+                    frame.innerHTML = content;
+
+                    // Mark ritual piece as found
+                    if (typeof gameState !== 'undefined') {
+                        gameState.ritualPieces.date = true;
+                        if (typeof checkRitualProgress === 'function') checkRitualProgress();
+                    }
+                    if (typeof triggerEchoAppearance === 'function') setTimeout(() => triggerEchoAppearance(), 1000);
+                } else {
+                    frame.innerHTML = `
+                <div style="padding:40px; font-family:Tahoma, sans-serif; text-align:center;">
+                    <h2 style="color:#333;">The page cannot be displayed</h2>
+                    <p style="color:#666;">The page you are looking for is currently unavailable.</p>
+                    <hr style="margin: 20px 0;">
+                    <p style="font-size:12px; color:#999;">Please try the following:<br>• Check the spelling of the address<br>• Try a different website (google, microsoft, yahoo, ebay)</p>
+                </div>`;
+                }
+            };
+
+            // Log Off Functionality
+            const logOffBtn = document.querySelector('.start-footer .menu-item:last-child'); // Assuming 'Log Off' is last
+            if (logOffBtn) {
+                logOffBtn.addEventListener('click', () => {
+                    startMenu.style.display = 'none';
+                    desktop.style.display = 'none';
+                    taskbar.style.display = 'none';
+                    loginScreen.style.display = 'flex';
+                    document.getElementById('password-input').value = '';
+                    document.getElementById('login-error').style.display = 'none';
+
+                    // Close all windows
+                    document.querySelectorAll('.window').forEach(w => w.remove());
+                    document.querySelectorAll('.task-item').forEach(t => t.remove());
+                });
+            }
+
+            // Calculator
+            function renderCalculator() {
+                return `
+            <div class="calc-container">
+                <input type="text" class="calc-display" id="calc-display" value="0" readonly>
+                <div class="calc-buttons">
+                    <button class="calc-btn red" onclick="window.calcInput('C')">C</button>
+                    <button class="calc-btn" onclick="window.calcInput('/')">/</button>
+                    <button class="calc-btn" onclick="window.calcInput('*')">*</button>
+                    <button class="calc-btn" onclick="window.calcInput('bs')">←</button>
+                    
+                    <button class="calc-btn blue" onclick="window.calcInput('7')">7</button>
+                    <button class="calc-btn blue" onclick="window.calcInput('8')">8</button>
+                    <button class="calc-btn blue" onclick="window.calcInput('9')">9</button>
+                    <button class="calc-btn" onclick="window.calcInput('-')">-</button>
+                    
+                    <button class="calc-btn blue" onclick="window.calcInput('4')">4</button>
+                    <button class="calc-btn blue" onclick="window.calcInput('5')">5</button>
+                    <button class="calc-btn blue" onclick="window.calcInput('6')">6</button>
+                    <button class="calc-btn" onclick="window.calcInput('+')">+</button>
+                    
+                    <button class="calc-btn blue" onclick="window.calcInput('1')">1</button>
+                    <button class="calc-btn blue" onclick="window.calcInput('2')">2</button>
+                    <button class="calc-btn blue" onclick="window.calcInput('3')">3</button>
+                    <button class="calc-btn" onclick="window.calcInput('=')" style="grid-row: span 2;">=</button>
+                    
+                    <button class="calc-btn blue" onclick="window.calcInput('0')" style="grid-column: span 2;">0</button>
+                    <button class="calc-btn blue" onclick="window.calcInput('.')">.</button>
+                </div>
+            </div>
+        `;
+            }
+
+            let calcExpression = '';
+            window.calcInput = function (val) {
+                const displays = document.querySelectorAll('.calc-display');
+                const display = displays[displays.length - 1];
+                if (!display) return;
+
+                if (val === 'C') {
+                    calcExpression = '';
+                    display.value = '0';
+                } else if (val === 'bs') {
+                    calcExpression = calcExpression.slice(0, -1);
+                    display.value = calcExpression || '0';
+                } else if (val === '=') {
+                    try {
+                        calcExpression = eval(calcExpression).toString();
+                        display.value = calcExpression;
+                    } catch (e) {
+                        display.value = 'Error';
+                        calcExpression = '';
+                    }
+                } else {
+                    calcExpression += val;
+                    display.value = calcExpression;
+                }
+            };
+
+            // Minesweeper
+            let mineBoard = [];
+            let mineGameOver = false;
+
+            function renderMinesweeper(newGame = true) {
+                if (newGame) initMineGame();
+
+                let gridHTML = '';
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        const idx = r * 8 + c;
+                        const cell = mineBoard[idx];
+                        let content = '';
+                        let classes = 'mine-cell';
+
+                        if (cell.revealed) {
+                            classes += ' revealed';
+                            if (cell.isMine) {
+                                classes += ' mine';
+                                content = '💣';
+                            } else if (cell.count > 0) {
+                                content = cell.count;
+                                classes += ` c${cell.count}`;
+                            }
+                        } else if (cell.flagged) {
+                            content = '🚩';
+                        }
+
+                        gridHTML += `<div class="${classes}" onclick="window.mineClick(${idx})" oncontextmenu="window.mineFlag(${idx}); return false;">${content}</div>`;
+                    }
+                }
+
+                return `
+            <div class="mine-container" oncontextmenu="return false;" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div class="mine-header" style="width: auto; margin-bottom: 8px;">
+                    <div class="mine-counter">${10 - mineBoard.filter(c => c.flagged).length}</div>
+                    <div class="mine-face" onclick="window.restartMine()">${mineGameOver ? '😵' : (checkWin() ? '😎' : '🙂')}</div>
+                    <div class="mine-counter">000</div>
+                </div>
+                <div class="mine-grid" style="grid-template-columns: repeat(8, 16px); margin: 0 auto;">
+                    ${gridHTML}
+                </div>
+            </div>
+        `;
+            }
+
+            function checkWin() {
+                if (mineGameOver) return false;
+                const nonMines = mineBoard.filter(c => !c.isMine);
+                return nonMines.every(c => c.revealed);
+            }
+
+            function initMineGame() {
+                mineBoard = [];
+                mineGameOver = false;
+                const size = 64;
+                const mines = 10;
+
+                for (let i = 0; i < size; i++) {
+                    mineBoard.push({ isMine: false, revealed: false, flagged: false, count: 0 });
+                }
+
+                let placed = 0;
+                while (placed < mines) {
+                    const idx = Math.floor(Math.random() * size);
+                    if (!mineBoard[idx].isMine) {
+                        mineBoard[idx].isMine = true;
+                        placed++;
+                    }
+                }
+
+                for (let i = 0; i < size; i++) {
+                    if (mineBoard[i].isMine) continue;
+                    const r = Math.floor(i / 8);
+                    const c = i % 8;
+                    let count = 0;
+                    for (let dr = -1; dr <= 1; dr++) {
+                        for (let dc = -1; dc <= 1; dc++) {
+                            const nr = r + dr, nc = c + dc;
+                            if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && mineBoard[nr * 8 + nc].isMine) count++;
+                        }
+                    }
+                    mineBoard[i].count = count;
+                }
+            }
+
+            window.mineClick = function (idx) {
+                if (mineGameOver || mineBoard[idx].flagged || mineBoard[idx].revealed) return;
+
+                if (mineBoard[idx].isMine) {
+                    mineBoard[idx].revealed = true;
+                    mineGameOver = true;
+                    mineBoard.forEach(c => { if (c.isMine) c.revealed = true; });
+                } else {
+                    revealCell(idx);
+                }
+                updateMineUI();
+            };
+
+            function revealCell(idx) {
+                const cell = mineBoard[idx];
+                if (cell.revealed || cell.flagged) return;
+                cell.revealed = true;
+
+                if (cell.count === 0) {
+                    const r = Math.floor(idx / 8);
+                    const c = idx % 8;
+                    for (let dr = -1; dr <= 1; dr++) {
+                        for (let dc = -1; dc <= 1; dc++) {
+                            const nr = r + dr, nc = c + dc;
+                            if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) revealCell(nr * 8 + nc);
+                        }
+                    }
+                }
+            }
+
+            window.mineFlag = function (idx) {
+                if (mineGameOver || mineBoard[idx].revealed) return;
+                mineBoard[idx].flagged = !mineBoard[idx].flagged;
+                updateMineUI();
+            };
+
+            window.restartMine = function () {
+                initMineGame();
+                updateMineUI();
+            };
+
+            function updateMineUI() {
+                const wins = document.querySelectorAll('.window');
+                wins.forEach(w => {
+                    if (w.querySelector('.window-title')?.textContent === 'Minesweeper') {
+                        w.querySelector('.window-content').innerHTML = renderMinesweeper(false);
+                    }
+                });
+            }
+
+            // Paint
+            window.renderPaint = function () {
+                // Delay canvas init to ensure DOM is ready
+                setTimeout(() => window.initPaint(), 100);
+                return `
+            <div class="paint-container">
+                <div class="paint-toolbar">
+                    <div class="paint-tool active" data-tool="brush" onclick="window.setPaintTool('brush')">🖌️</div>
+                    <div class="paint-tool" data-tool="eraser" onclick="window.setPaintTool('eraser')">⬜</div>
+                </div>
+                <div class="paint-canvas-area">
+                    <canvas class="paint-canvas" width="600" height="400"></canvas>
+                </div>
+                <div class="paint-palette">
+                    <div class="paint-color" style="background:black" onclick="window.setPaintColor('black')"></div>
+                    <div class="paint-color" style="background:white" onclick="window.setPaintColor('white')"></div>
+                    <div class="paint-color" style="background:red" onclick="window.setPaintColor('red')"></div>
+                    <div class="paint-color" style="background:green" onclick="window.setPaintColor('green')"></div>
+                    <div class="paint-color" style="background:blue" onclick="window.setPaintColor('blue')"></div>
+                    <div class="paint-color" style="background:yellow" onclick="window.setPaintColor('yellow')"></div>
+                    <div class="paint-color" style="background:orange" onclick="window.setPaintColor('orange')"></div>
+                    <div class="paint-color" style="background:purple" onclick="window.setPaintColor('purple')"></div>
+                    <div class="paint-color" style="background:brown" onclick="window.setPaintColor('brown')"></div>
+                    <div class="paint-color" style="background:grey" onclick="window.setPaintColor('grey')"></div>
+                </div>
+            </div>
+        `;
+            };
+
+            window.paintState = {
+                color: 'black',
+                tool: 'brush',
+                isDrawing: false,
+                lastX: 0,
+                lastY: 0
+            };
+
+            window.initPaint = function () {
+                const canvases = document.querySelectorAll('.paint-canvas');
+                // Attach content to the *latest* canvas added
+                const canvas = canvases[canvases.length - 1];
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                canvas.addEventListener('mousedown', (e) => {
+                    window.paintState.isDrawing = true;
+                    [window.paintState.lastX, window.paintState.lastY] = [e.offsetX, e.offsetY];
+                });
+
+                canvas.addEventListener('mousemove', (e) => {
+                    if (!window.paintState.isDrawing) return;
+                    window.drawPaint(ctx, e.offsetX, e.offsetY);
+                });
+
+                canvas.addEventListener('mouseup', () => window.paintState.isDrawing = false);
+                canvas.addEventListener('mouseout', () => window.paintState.isDrawing = false);
+            };
+
+            window.drawPaint = function (ctx, x, y) {
+                ctx.beginPath();
+                ctx.moveTo(window.paintState.lastX, window.paintState.lastY);
+                ctx.lineTo(x, y);
+
+                if (window.paintState.tool === 'eraser') {
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 10;
+                } else {
+                    ctx.strokeStyle = window.paintState.color;
+                    ctx.lineWidth = 2;
+                }
+
+                ctx.lineCap = 'round';
+                ctx.stroke();
+                [window.paintState.lastX, window.paintState.lastY] = [x, y];
+            };
+
+            window.setPaintColor = function (color) {
+                window.paintState.color = color;
+            };
+
+            window.setPaintTool = function (tool) {
+                window.paintState.tool = tool;
+            };
+
+
+            // Initialize Default Icons (Click handlers) and Start Menu Items
+            const icons = document.querySelectorAll('.desktop-icon');
+            icons.forEach(icon => {
+                icon.addEventListener('dblclick', () => {
+                    window.launchApp(icon.dataset.app);
+                });
+            });
+
+            // Universal Launcher
+            window.launchApp = function (appId, arg) {
+                // Close start menu
+                const startMenu = document.getElementById('start-menu');
+                if (startMenu) startMenu.style.display = 'none';
+
+                if (appId === 'notepad') {
+                    openWindow('notepad', 'Untitled - Notepad', `<textarea style="width:100%; height:100%; border:none; resize:none; font-family: monospace; padding: 5px; outline:none; display:block; overflow:auto;">${arg || ''}</textarea>`, 600, 400);
+                } else if (appId === 'cpanel') {
+                    openWindow('cpanel', 'Control Panel', renderControlPanel(), 600, 450);
+                } else if (appId === 'mycomputer' || appId === 'explorer') {
+                    if (arg && arg.includes('Control Panel')) {
+                        openWindow('cpanel', 'Control Panel', renderControlPanel(), 600, 450);
+                        return;
+                    }
+                    const path = arg || 'My Computer';
+                    openWindow('explorer', path, renderExplorer(path), 600, 450);
+                } else if (appId === 'ie') {
+                    openWindow('ie', 'Internet Explorer', renderIE(), 700, 500);
+                } else if (appId === 'mydocs') {
+                    // My Documents - Use correct path based on current user
+                    const isGuest = typeof gameState !== 'undefined' && gameState.currentUser === 'guest';
+                    const path = isGuest ? 'C:/Users/Guest/Belgelerim' : 'C:/Users/Admin/Belgelerim';
+                    const title = isGuest ? 'Belgelerim' : 'Belgelerim';
+                    openWindow('explorer', title, renderExplorer(path), 600, 450);
+                } else if (appId === 'bin') {
+                    // Recycle Bin - Has deleted note with password hints (Guest only)
+                    const isGuest = typeof gameState !== 'undefined' && gameState.currentUser === 'guest';
+                    const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+
+                    if (isGuest) {
+                        const content = typeof translations !== 'undefined' && translations[lang] ? translations[lang]['deletedNote'] : 'Deleted file hint...';
+                        openWindow('explorer', 'Recycle Bin', `
+                    <div style="padding: 10px;">
+                        <div class="file-item" style="cursor:pointer; opacity: 0.7;" ondblclick="window.openDeletedNote()">
+                            <div style="font-size:32px;">🗑️📄</div>
+                            <span style="text-decoration:line-through;">${lang === 'tr' ? 'SİLME_BUNU.txt' : 'DONT_DELETE.txt'}</span>
+                        </div>
+                        <p style="margin-top:20px; font-size:11px; color:#666;">
+                            ${lang === 'tr' ? 'Bu dosya silinmiş ama geri yüklenebilir.' : 'This file was deleted but can be restored.'}
+                        </p>
+                    </div>
+                `, 500, 350);
+                    } else {
+                        openWindow('explorer', 'Recycle Bin', '<div style="padding:20px; color:#666;">Empty</div>', 600, 450);
+                    }
+                } else if (appId === 'paint') {
+                    openWindow('paint', 'Untitled - Paint', renderPaint(), 650, 500);
+                } else if (appId === 'calc') {
+                    openWindow('calc', 'Calculator', renderCalculator(), 200, 250);
+                } else if (appId === 'minesweeper') {
+                    openWindow('minesweeper', 'Minesweeper', renderMinesweeper(true), 180, 240);
+                } else if (appId === 'help') {
+                    openWindow('help', 'Help and Support Center', `
+                <div style="padding: 20px; font-family: Tahoma, sans-serif;">
+                    <h2 style="color: #003399;">Help and Support Center</h2>
+                    <p>Welcome to Windows XP Help and Support.</p>
+                    <ul>
+                        <li>What's new in Windows XP</li>
+                        <li>Music, video, games, and photos</li>
+                        <li>Windows basics</li>
+                        <li>Networking and the Web</li>
+                    </ul>
+                </div>
+            `, 500, 400);
+                } else if (appId === 'search') {
+                    openWindow('search', 'Search Results', `
+                <div style="padding: 20px; font-family: Tahoma, sans-serif;">
+                    <h3>Search for files and folders</h3>
+                    <div style="margin: 10px 0;">
+                        <label>All or part of the file name:</label><br>
+                        <input type="text" style="width: 200px; padding: 3px; margin-top: 5px;">
+                    </div>
+                    <div style="margin: 10px 0;">
+                        <label>A word or phrase in the file:</label><br>
+                        <input type="text" style="width: 200px; padding: 3px; margin-top: 5px;">
+                    </div>
+                    <button style="margin-top: 10px; padding: 5px 15px;">Search</button>
+                </div>
+            `, 400, 350);
+                } else if (appId === 'run') {
+                    openWindow('run', 'Run', `
+                <div style="padding: 15px; font-family: Tahoma, sans-serif; background: #ECE9D8; height: 100%;">
+                    <div style="display: flex; align-items: flex-start;">
+                        <div style="font-size: 32px; margin-right: 15px;">📦</div>
+                        <div>
+                            <p style="margin: 0 0 10px 0;">Type the name of a program, folder, document, or Internet resource, and Windows will open it for you.</p>
+                            <label>Open:</label>
+                            <input type="text" id="run-input" style="width: 250px; padding: 3px; margin-left: 5px;">
+                        </div>
+                    </div>
+                    <div style="text-align: right; margin-top: 15px;">
+                        <button style="padding: 5px 20px; margin-right: 5px;">OK</button>
+                        <button style="padding: 5px 20px; margin-right: 5px;">Cancel</button>
+                        <button style="padding: 5px 20px;">Browse...</button>
+                    </div>
+                </div>
+            `, 400, 180);
+                } else if (appId === 'shutdown') {
+                    openWindow('shutdown', 'Turn Off Computer', `
+                <div style="padding: 20px; text-align: center; background: linear-gradient(to bottom, #1868CE 0%, #0E4EAF 100%); height: 100%; color: white;">
+                    <h3 style="margin-bottom: 20px;">What do you want the computer to do?</h3>
+                    <div style="display: flex; justify-content: center; gap: 30px;">
+                        <div style="cursor: pointer; text-align: center;">
+                            <div style="font-size: 40px;">🟡</div>
+                            <div>Stand By</div>
+                        </div>
+                        <div style="cursor: pointer; text-align: center;" onclick="alert('Goodbye!')">
+                            <div style="font-size: 40px;">🔴</div>
+                            <div>Turn Off</div>
+                        </div>
+                        <div style="cursor: pointer; text-align: center;">
+                            <div style="font-size: 40px;">🟢</div>
+                            <div>Restart</div>
+                        </div>
+                    </div>
+                </div>
+            `, 350, 200);
+                } else if (appId === 'logoff') {
+                    // Log off functionality
+                    const desktopEl = document.getElementById('desktop');
+                    const adminDesktop = document.getElementById('admin-desktop');
+                    const taskbarEl = document.getElementById('taskbar');
+                    const loginScreenEl = document.getElementById('login-screen');
+                    if (desktopEl) desktopEl.style.display = 'none';
+                    if (adminDesktop) adminDesktop.style.display = 'none';
+                    if (taskbarEl) taskbarEl.style.display = 'none';
+                    if (loginScreenEl) loginScreenEl.style.display = 'flex';
+                    document.getElementById('password-input').value = '';
+                    document.getElementById('login-error').style.display = 'none';
+                    // Reset password panel
+                    const guestLogin = document.getElementById('guest-login');
+                    const adminLogin = document.getElementById('admin-login');
+                    const passwordPanel = document.getElementById('password-panel');
+                    if (guestLogin) guestLogin.style.display = 'flex';
+                    if (adminLogin) adminLogin.style.display = 'flex';
+                    if (passwordPanel) passwordPanel.style.display = 'none';
+                    // Close all windows
+                    document.querySelectorAll('.window').forEach(w => w.remove());
+                    document.querySelectorAll('.task-item').forEach(t => t.remove());
+                }
+                // ===== GAME SPECIFIC APPS =====
+                else if (appId === 'adminreadme') {
+                    // Admin's readme file
+                    const content = typeof t === 'function' ? t('adminReadme') : 'Read the admin readme...';
+                    openWindow('notepad', 'oku_beni.txt', `<textarea style="width:100%; height:100%; border:none; resize:none; font-family: monospace; padding: 5px; outline:none; display:block; overflow:auto; background:#fff; color:#000;">${content}</textarea>`, 500, 400);
+                } else if (appId === 'echoproject') {
+                    // ECHO project folder - show as explorer
+                    openWindow('explorer', 'ECHO_proje', renderGameFolder('ECHO_proje'), 600, 450);
+                } else if (appId === 'dontlook') {
+                    // BAKMA folder - creepy
+                    if (typeof triggerGlitch === 'function') triggerGlitch();
+                    openWindow('explorer', 'BAKMA', `<div style="padding:20px; color:#8b0000; font-family:monospace; text-align:center;">
+                <p style="font-size:24px;">...</p>
+                <p style="margin-top:50px; opacity:0.5;">Bazı şeyler görmemek daha iyidir.</p>
+                <p style="margin-top:10px; opacity:0.5;">Some things are better left unseen.</p>
+            </div>`, 400, 300);
+                } else if (appId === 'destroyer') {
+                    // Destroyer.exe - Final ritual
+                    const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+                    const piecesFound = typeof gameState !== 'undefined' ?
+                        Object.values(gameState.ritualPieces).filter(p => p).length : 0;
+
+                    if (piecesFound < 3) {
+                        const msg = lang === 'tr' ?
+                            `Ritual parçaları eksik! (${piecesFound}/3)\n\nTüm parçaları bulmalısın:\n1. ECHO_core.sys (C:\\Windows\\System32\\drivers)\n2. creator.txt ([GİZLİ] klasörü)\n3. about:ECHO (Internet Explorer)` :
+                            `Ritual pieces missing! (${piecesFound}/3)\n\nYou must find all pieces:\n1. ECHO_core.sys (C:\\Windows\\System32\\drivers)\n2. creator.txt ([HIDDEN] folder)\n3. about:ECHO (Internet Explorer)`;
+                        alert(msg);
+                    } else {
+                        // All pieces found - start ritual!
+                        if (typeof startRitual === 'function') {
+                            startRitual();
+                        } else {
+                            // Fallback ritual
+                            runFinalSequence();
+                        }
+                    }
+                } else if (appId === 'cdrive') {
+                    // C: drive access for Admin
+                    openWindow('explorer', 'C:', renderCDrive(), 600, 450);
+                } else if (appId === 'echocore') {
+                    // ECHO_core.sys - Ritual piece 1
+                    const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+                    const content = lang === 'tr' ?
+                        translations.tr.ritualCode :
+                        translations.en.ritualCode;
+
+                    if (typeof triggerGlitch === 'function') triggerGlitch();
+                    openWindow('notepad', 'ECHO_core.sys',
+                        `<textarea style="width:100%; height:100%; border:none; resize:none; font-family: monospace; padding: 5px; outline:none; display:block; overflow:auto; background:#000; color:#00ff00;">${content}</textarea>`,
+                        400, 300);
+
+                    // Mark ritual piece as found
+                    if (typeof gameState !== 'undefined') {
+                        gameState.ritualPieces.code = true;
+                        if (typeof checkRitualProgress === 'function') checkRitualProgress();
+                    }
+                    if (typeof triggerEchoAppearance === 'function') setTimeout(() => triggerEchoAppearance(), 2000);
+                } else if (appId === 'okutxt') {
+                    // oku.txt - Password piece 4 (format hint)
+                    const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+                    const content = 'Beni Oku\n========\nTüm parçaları buldun mu?\n\nProje adı + Yıl = Şifre\nHepsini birleştir ve Admin hesabına gir.\n\n[4. PARÇA: FORMAT = İSİM + YIL]';
+
+                    openWindow('notepad', 'oku.txt',
+                        `<textarea style="width:100%; height:100%; border:none; resize:none; font-family: monospace; padding: 5px; outline:none; display:block; overflow:auto; background:#fffdd0; color:#333;">${content}</textarea>`,
+                        400, 300);
+
+                    // Mark password piece as found
+                    if (typeof gameState !== 'undefined') {
+                        gameState.passwordPieces.piece4 = true;
+                        if (typeof checkPasswordProgress === 'function') checkPasswordProgress();
+                    }
+                } else if (appId === 'belgelerim') {
+                    // Belgelerim folder for Guest
+                    openWindow('explorer', 'Belgelerim', `
+                <div style="padding: 10px; display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div class="file-item" style="cursor:pointer;" ondblclick="window.openNotlarTxt()">
+                        <div style="font-size:24px;">📄</div>
+                        <span>notlar.txt</span>
+                    </div>
+                </div>
+            `, 400, 300);
+                }
+            };
+
+            // Game folder renderer
+            function renderGameFolder(folderName) {
+                if (folderName === 'ECHO_proje') {
+                    return `
+                <div style="padding: 10px; display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div class="file-item folder" style="cursor:pointer;" ondblclick="window.openGameSubfolder('gunlukler')">
+                        <div style="font-size:32px;">📁</div>
+                        <span>gunlukler</span>
+                    </div>
+                    <div class="file-item folder" style="cursor:pointer;" ondblclick="window.openGameSubfolder('kurbanlar')">
+                        <div style="font-size:32px;">📁</div>
+                        <span>kurbanlar</span>
+                    </div>
+                    <div class="file-item folder" style="cursor:pointer; opacity:0.5;" ondblclick="window.openLockedFolder()">
+                        <div style="font-size:32px;">🔒</div>
+                        <span>[GİZLİ]</span>
+                    </div>
+                </div>
+            `;
+                }
+                return '<div>Empty</div>';
+            }
+
+            // Game subfolder handler
+            window.openGameSubfolder = function (name) {
+                if (name === 'gunlukler') {
+                    const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+                    openWindow('explorer', 'gunlukler', `
+                <div style="padding: 10px; display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div class="file-item" style="cursor:pointer;" ondblclick="window.openDiary(1)">
+                        <div style="font-size:24px;">📄</div>
+                        <span>gun_001.txt</span>
+                    </div>
+                    <div class="file-item" style="cursor:pointer;" ondblclick="window.openDiary(15)">
+                        <div style="font-size:24px;">📄</div>
+                        <span>gun_015.txt</span>
+                    </div>
+                    <div class="file-item" style="cursor:pointer;" ondblclick="window.openDiary(30)">
+                        <div style="font-size:24px;">📄</div>
+                        <span>gun_030.txt</span>
+                    </div>
+                    <div class="file-item" style="cursor:pointer;" ondblclick="window.openDiary(45)">
+                        <div style="font-size:24px;">📄</div>
+                        <span>gun_045.txt</span>
+                    </div>
+                    <div class="file-item" style="cursor:pointer; color:#8b0000;" ondblclick="window.openDiary(60)">
+                        <div style="font-size:24px;">📄</div>
+                        <span>gun_060.txt</span>
+                    </div>
+                    <div class="file-item" style="cursor:pointer; color:#ff0000;" ondblclick="window.openDiary('final')">
+                        <div style="font-size:24px;">📄</div>
+                        <span>gun_????.txt</span>
+                    </div>
+                </div>
+            `, 500, 350);
+                } else if (name === 'kurbanlar') {
+                    openWindow('explorer', 'kurbanlar', `
+                <div style="padding: 10px;">
+                    <div class="file-item" style="cursor:pointer;" ondblclick="window.openVictimsList()">
+                        <div style="font-size:24px;">📄</div>
+                        <span>kayip_listesi.txt</span>
+                    </div>
+                </div>
+            `, 400, 300);
+                }
+            };
+
+            // Render C: Drive for Admin
+            function renderCDrive() {
+                return `
+            <div style="padding: 10px; display: flex; flex-wrap: wrap; gap: 15px;">
+                <div class="file-item folder" style="cursor:pointer;" ondblclick="window.openCDriveFolder('Windows')">
+                    <div style="font-size:32px;">📁</div>
+                    <span>Windows</span>
+                </div>
+                <div class="file-item folder" style="cursor:pointer;" ondblclick="window.openCDriveFolder('Program Files')">
+                    <div style="font-size:32px;">📁</div>
+                    <span>Program Files</span>
+                </div>
+                <div class="file-item folder" style="cursor:pointer;" ondblclick="window.openCDriveFolder('Documents and Settings')">
+                    <div style="font-size:32px;">📁</div>
+                    <span>Documents and Settings</span>
+                </div>
+            </div>
+        `;
+            }
+
+            window.openCDriveFolder = function (name) {
+                if (name === 'Windows') {
+                    openWindow('explorer', 'Windows', `
+                <div style="padding: 10px; display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div class="file-item folder" style="cursor:pointer;" ondblclick="window.openCDriveFolder('System32')">
+                        <div style="font-size:32px;">📁</div>
+                        <span>System32</span>
+                    </div>
+                    <div class="file-item" style="cursor:pointer;" ondblclick="window.openSystemIni()">
+                        <div style="font-size:24px;">📄</div>
+                        <span>system.ini</span>
+                    </div>
+                </div>
+            `, 500, 350);
+                } else if (name === 'System32') {
+                    openWindow('explorer', 'System32', `
+                <div style="padding: 10px; display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div class="file-item folder" style="cursor:pointer;" ondblclick="window.openCDriveFolder('drivers')">
+                        <div style="font-size:32px;">📁</div>
+                        <span>drivers</span>
+                    </div>
+                    <div class="file-item" style="cursor:pointer;">
+                        <div style="font-size:24px;">⚙️</div>
+                        <span>cmd.exe</span>
+                    </div>
+                    <div class="file-item" style="cursor:pointer;" ondblclick="window.launchApp('notepad')">
+                        <div style="font-size:24px;">📝</div>
+                        <span>notepad.exe</span>
+                    </div>
+                    <div class="file-item" style="cursor:pointer;" ondblclick="window.launchApp('calc')">
+                        <div style="font-size:24px;">🔢</div>
+                        <span>calc.exe</span>
+                    </div>
+                </div>
+            `, 500, 350);
+                } else if (name === 'drivers') {
+                    // This is where ECHO_core.sys is hidden!
+                    const showHidden = typeof gameState !== 'undefined' && gameState.hiddenFilesVisible;
+                    openWindow('explorer', 'drivers', `
+                <div style="padding: 10px; display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div class="file-item" style="cursor:pointer;">
+                        <div style="font-size:24px;">📄</div>
+                        <span>etc</span>
+                    </div>
+                    <div class="file-item ${showHidden ? '' : 'hidden-file'}" style="cursor:pointer; ${showHidden ? '' : 'opacity:0.3;'}" ondblclick="window.launchApp('echocore')">
+                        <div style="font-size:24px;">⚠️</div>
+                        <span>ECHO_core.sys</span>
+                    </div>
+                </div>
+                <div style="margin-top:20px; padding:10px; background:#ffe0e0; border:1px solid #ff0000; font-size:11px;">
+                    <label style="cursor:pointer;">
+                        <input type="checkbox" onchange="window.toggleHiddenFiles(this.checked)"> 
+                        ${typeof currentLang !== 'undefined' && currentLang === 'tr' ? 'Gizli dosyaları göster' : 'Show hidden files'}
+                    </label>
+                </div>
+            `, 500, 350);
+                } else if (name === 'Program Files') {
+                    openWindow('explorer', 'Program Files', `
+                <div style="padding: 10px; display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div class="file-item folder" style="cursor:pointer;" ondblclick="window.openCDriveFolder('ECHO')">
+                        <div style="font-size:32px; color:#8b0000;">📁</div>
+                        <span style="color:#8b0000;">ECHO</span>
+                    </div>
+                    <div class="file-item folder" style="cursor:pointer;">
+                        <div style="font-size:32px;">📁</div>
+                        <span>Internet Explorer</span>
+                    </div>
+                </div>
+            `, 500, 350);
+                } else if (name === 'ECHO') {
+                    // ECHO folder with destroyer.exe
+                    if (typeof triggerGlitch === 'function') triggerGlitch();
+                    openWindow('explorer', 'ECHO', `
+                <div style="padding: 10px; background:#1a0a0a; height:100%;">
+                    <div class="file-item" style="cursor:pointer; text-align:center;" ondblclick="window.launchApp('destroyer')">
+                        <div style="font-size:48px;">💀</div>
+                        <span style="color:#ff0000; font-weight:bold;">destroyer.exe</span>
+                    </div>
+                    <p style="color:#ff0000; margin-top:30px; font-family:monospace; text-align:center;">
+                        ${typeof currentLang !== 'undefined' && currentLang === 'tr' ?
+                            'UYARI: Bu programı çalıştırmak geri dönüşü olmayan sonuçlara yol açabilir.' :
+                            'WARNING: Running this program may have irreversible consequences.'}
+                    </p>
+                </div>
+            `, 400, 300);
+                }
+            };
+
+            window.toggleHiddenFiles = function (show) {
+                if (typeof gameState !== 'undefined') {
+                    gameState.hiddenFilesVisible = show;
+                }
+                // Refresh the drivers folder view
+                window.openCDriveFolder('drivers');
+            };
+
+            window.openSystemIni = function () {
+                const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+                const content = typeof translations !== 'undefined' && translations[lang] ? translations[lang]['systemIni'] : '[boot]\nshell=Explorer.exe';
+
+                openWindow('notepad', 'system.ini',
+                    `<textarea style="width:100%; height:100%; border:none; resize:none; font-family: monospace; padding: 5px; outline:none; display:block; overflow:auto; background:#fff; color:#000;">${content}</textarea>`,
+                    400, 250);
+
+                // Mark password piece as found
+                if (typeof gameState !== 'undefined') {
+                    gameState.passwordPieces.piece1 = true;
+                    if (typeof checkPasswordProgress === 'function') checkPasswordProgress();
+                }
+            };
+
+            // Final Sequence - Game Ending
+            function runFinalSequence() {
+                const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+
+                // 1. Screen goes white
+                document.body.style.transition = 'background 0.5s';
+                document.body.style.background = '#fff';
+
+                if (typeof playSound === 'function') playSound('jumpscare');
+
+                setTimeout(() => {
+                    // 2. Screen goes black
+                    document.body.style.background = '#000';
+
+                    setTimeout(() => {
+                        // 3. Show BSOD
+                        const bsod = document.getElementById('bsod-screen');
+                        const desktop = document.getElementById('desktop');
+                        const adminDesktop = document.getElementById('admin-desktop');
+                        const taskbar = document.getElementById('taskbar');
+
+                        if (desktop) desktop.style.display = 'none';
+                        if (adminDesktop) adminDesktop.style.display = 'none';
+                        if (taskbar) taskbar.style.display = 'none';
+
+                        // Close all windows
+                        document.querySelectorAll('.window').forEach(w => w.remove());
+
+                        if (bsod) {
+                            bsod.style.display = 'flex';
+
+                            // 4. After BSOD, show final screen
+                            setTimeout(() => {
+                                bsod.style.display = 'none';
+                                showFinalMessage();
+                            }, 8000);
+                        }
+                    }, 2000);
+                }, 1000);
+            }
+
+            function showFinalMessage() {
+                const final = document.getElementById('final-screen');
+                const content = document.getElementById('final-content');
+                const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+
+                if (final && content) {
+                    final.style.display = 'flex';
+                    content.innerHTML = '';
+
+                    const text = lang === 'tr' ? translations.tr.thankYou : translations.en.thankYou;
+                    let i = 0;
+
+                    // Typewriter effect
+                    const typeWriter = setInterval(() => {
+                        if (i < text.length) {
+                            content.textContent += text.charAt(i);
+                            i++;
+                        } else {
+                            clearInterval(typeWriter);
+
+                            // Final jumpscare
+                            setTimeout(() => {
+                                const jumpScreen = document.getElementById('jumpscare-screen');
+                                if (jumpScreen) {
+                                    if (typeof playSound === 'function') playSound('jumpscare');
+                                    jumpScreen.style.display = 'flex';
+
+                                    setTimeout(() => {
+                                        jumpScreen.style.display = 'none';
+                                        showCredits();
+                                    }, 2000);
+                                }
+                            }, 3000);
+                        }
+                    }, 100);
+                }
+            }
+
+            function showCredits() {
+                const content = document.getElementById('final-content');
+                const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+
+                if (content) {
+                    content.innerHTML = `
+                <h1 style="font-size: 48px; margin-bottom: 50px; animation: fadeIn 2s;">SON KULLANICI</h1>
+                <h2 style="font-size: 24px; margin-bottom: 30px; animation: fadeIn 3s;">THE LAST USER</h2>
+                <p style="margin: 10px 0; animation: fadeIn 4s;">A Horror Experience</p>
+                <p style="margin: 50px 0; font-size: 12px; opacity: 0.5; animation: fadeIn 5s;">
+                    ${lang === 'tr' ? 'ECHO hala orada mı?' : 'Is ECHO still there?'}
+                </p>
+                <p style="margin-top: 80px; font-size: 10px; opacity: 0.3; animation: fadeIn 6s;">
+                    Press F5 to restart / Yeniden başlamak için F5'e bas
+                </p>
+            `;
+                }
+            }
+
+            window.openDiary = function (day) {
+                const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+                let contentKey = 'diary1';
+                if (day === 15) contentKey = 'diary15';
+                else if (day === 30) contentKey = 'diary30';
+                else if (day === 45) contentKey = 'diary45';
+                else if (day === 60) contentKey = 'diary60';
+                else if (day === 'final') contentKey = 'diaryFinal';
+
+                const content = typeof translations !== 'undefined' && translations[lang] ? translations[lang][contentKey] : 'Diary entry...';
+
+                openWindow('notepad', `gun_${day === 'final' ? '????' : String(day).padStart(3, '0')}.txt`,
+                    `<textarea style="width:100%; height:100%; border:none; resize:none; font-family: monospace; padding: 5px; outline:none; display:block; overflow:auto; background:#fff; color:#000;">${content}</textarea>`,
+                    450, 350);
+
+                // Trigger effects for scary entries
+                if (day === 30 || day === 45) {
+                    if (typeof triggerGlitch === 'function') triggerGlitch();
+                }
+                if (day === 45 || day === 60) {
+                    if (typeof triggerEchoAppearance === 'function') setTimeout(() => triggerEchoAppearance(), 2000);
+                }
+                if (day === 'final') {
+                    if (typeof gameState !== 'undefined') gameState.echoAwakened = true;
+                    if (typeof triggerJumpscare === 'function') setTimeout(() => triggerJumpscare('mini'), 3000);
+                }
+            };
+
+            window.openVictimsList = function () {
+                const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+                const content = typeof translations !== 'undefined' && translations[lang] ? translations[lang]['victims'] : 'Victims list...';
+
+                openWindow('notepad', 'kayip_listesi.txt',
+                    `<textarea style="width:100%; height:100%; border:none; resize:none; font-family: monospace; padding: 5px; outline:none; display:block; overflow:auto; background:#fff; color:#8b0000;">${content}</textarea>`,
+                    400, 400);
+
+                if (typeof triggerGlitch === 'function') triggerGlitch();
+            };
+
+            window.openLockedFolder = function () {
+                const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+                const correctPassword = lang === 'tr' ? 'UYANIS' : 'AWAKENING';
+                const promptMsg = lang === 'tr' ? 'Bu klasör şifreli. Şifreyi girin:' : 'This folder is password protected. Enter password:';
+
+                // Create XP-style password dialog
+                const dialogContent = `
+            <div style="padding: 15px; font-family: Tahoma, sans-serif; background: #ECE9D8; height: 100%; display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: flex-start; flex: 1;">
+                    <div style="font-size: 32px; margin-right: 15px;">🔒</div>
+                    <div style="flex: 1;">
+                        <p style="margin: 0 0 10px 0;">${promptMsg}</p>
+                        <input type="password" id="folder-password-input" style="width: 100%; padding: 5px; font-size: 14px;" onkeydown="if(event.key==='Enter') window.submitFolderPassword()">
+                    </div>
+                </div>
+                <div style="text-align: right; margin-top: 15px;">
+                    <button onclick="window.submitFolderPassword()" style="padding: 5px 20px; font-family: Tahoma; cursor: pointer; margin-right: 5px;">Tamam</button>
+                    <button onclick="this.closest('.window').querySelector('.close').click()" style="padding: 5px 20px; font-family: Tahoma; cursor: pointer;">İptal</button>
+                </div>
+            </div>
+        `;
+                openWindow('password-dialog', lang === 'tr' ? 'Şifre Gerekli' : 'Password Required', dialogContent, 380, 180);
+
+                // Focus the input after a short delay
+                setTimeout(() => {
+                    const input = document.getElementById('folder-password-input');
+                    if (input) input.focus();
+                }, 100);
+            };
+
+            window.submitFolderPassword = function () {
+                const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+                const correctPassword = lang === 'tr' ? 'UYANIS' : 'AWAKENING';
+                const input = document.getElementById('folder-password-input');
+                const password = input ? input.value : '';
+
+                // Close the dialog
+                const dialog = input.closest('.window');
+                if (dialog) dialog.querySelector('.close').click();
+
+                if (password && password.toUpperCase() === correctPassword) {
+                    // Open the hidden folder
+                    const content = typeof translations !== 'undefined' && translations[lang] ? translations[lang]['creatorTxt'] : 'Creator info...';
+
+                    openWindow('notepad', 'creator.txt',
+                        `<textarea style="width:100%; height:100%; border:none; resize:none; font-family: monospace; padding: 5px; outline:none; display:block; overflow:auto; background:#fff; color:#000;">${content}</textarea>`,
+                        450, 350);
+
+                    // Mark ritual piece as found
+                    if (typeof gameState !== 'undefined') {
+                        gameState.ritualPieces.name = true;
+                        if (typeof checkRitualProgress === 'function') checkRitualProgress();
+                    }
+                    if (typeof triggerEchoAppearance === 'function') triggerEchoAppearance();
+                } else if (password) {
+                    showXPError(lang === 'tr' ? 'Hata' : 'Error', lang === 'tr' ? 'Yanlış şifre!' : 'Wrong password!');
+                }
+            };
+
+            window.openDeletedNote = function () {
+                const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+                const content = typeof translations !== 'undefined' && translations[lang] ? translations[lang]['deletedNote'] : 'Deleted file...';
+
+                if (typeof triggerGlitch === 'function') triggerGlitch();
+
+                openWindow('notepad', lang === 'tr' ? 'SİLME_BUNU.txt' : 'DONT_DELETE.txt',
+                    `<textarea style="width:100%; height:100%; border:none; resize:none; font-family: monospace; padding: 5px; outline:none; display:block; overflow:auto; background:#fffdd0; color:#333;">${content}</textarea>`,
+                    500, 400);
+            };
+
+            window.openNotlarTxt = function () {
+                const content = 'Kişisel Notlar\n==============\nŞifreler için format: [PROJE_ADI][YIL]\nBüyük harf kullan!\n\n[3. PARÇA: FORMAT İPUCU]';
+
+                openWindow('notepad', 'notlar.txt',
+                    `<textarea style="width:100%; height:100%; border:none; resize:none; font-family: monospace; padding: 5px; outline:none; display:block; overflow:auto; background:#fff; color:#000;">${content}</textarea>`,
+                    400, 300);
+
+                // Mark password piece as found
+                if (typeof gameState !== 'undefined') {
+                    gameState.passwordPieces.piece3 = true;
+                    if (typeof checkPasswordProgress === 'function') checkPasswordProgress();
+                }
+            };
+
+            // File Open Handler Update
+            window.handleFileOpen = function (fullPath, type, element) {
+                const winContent = element ? element.closest('.window-content') : null;
+
+                // Check if folder is locked (Admin folder for Guest users)
+                if (type === 'folder' || type === 'drive') {
+                    const node = resolvePath(fullPath);
+                    if (node && node.locked) {
+                        const isGuest = typeof gameState !== 'undefined' && gameState.currentUser === 'guest';
+                        if (isGuest) {
+                            showXPError('Erişim Engellendi', 'Bu klasöre erişim yetkiniz yok.\n\nAccess Denied!');
+                            return;
+                        }
+                    }
+                }
+
+                if (type === 'folder' || type === 'drive' || type === 'link' || !type || type === 'root') {
+                    const newContent = renderExplorer(fullPath);
+                    if (winContent) {
+                        winContent.innerHTML = newContent;
+                    } else {
+                        openWindow('explorer', 'My Computer', newContent, 600, 400);
+                    }
+                } else if (type === 'file') {
+                    const fileName = fullPath.split('/').pop();
+                    if (fileName === 'calc.exe') {
+                        window.launchApp('calc');
+                    } else if (fileName === 'WinMine.exe') {
+                        window.launchApp('minesweeper');
+                    } else if (fileName === 'mspaint.exe') {
+                        window.launchApp('paint');
+                    } else if (fileName === 'iexplore.exe') {
+                        window.launchApp('ie');
+                    } else if (fileName === 'wmplayer.exe') {
+                        // Todo
+                    } else {
+                        // Open text files - Use translation if available, else fallback to fileSystem
+                        const lang = typeof currentLang !== 'undefined' ? currentLang : 'tr';
+                        let content = '';
+
+                        // Use translated content for password piece files
+                        if (fileName === 'system.ini' && typeof translations !== 'undefined') {
+                            content = translations[lang].systemIni || translations.tr.systemIni;
+                        } else if (fileName === 'log.txt' && typeof translations !== 'undefined') {
+                            content = translations[lang].tempLog || translations.tr.tempLog;
+                        } else if (fileName === 'notlar.txt' && typeof translations !== 'undefined') {
+                            content = translations[lang].notlarTxt || translations.tr.notlarTxt;
+                        } else {
+                            const node = resolvePath(fullPath);
+                            content = node && node.content ? node.content : 'File content not available.';
+                            content = content.replace(/\\n/g, '\n');
+                        }
+
+                        // Track password pieces for game
+                        if (fileName === 'system.ini' && typeof gameState !== 'undefined') {
+                            gameState.passwordPieces.piece1 = true;
+                            if (typeof checkPasswordProgress === 'function') checkPasswordProgress();
+                        }
+                        if (fileName === 'log.txt' && typeof gameState !== 'undefined') {
+                            gameState.passwordPieces.piece2 = true;
+                            if (typeof checkPasswordProgress === 'function') checkPasswordProgress();
+                        }
+                        if (fileName === 'notlar.txt' && typeof gameState !== 'undefined') {
+                            gameState.passwordPieces.piece3 = true;
+                            if (typeof checkPasswordProgress === 'function') checkPasswordProgress();
+                        }
+                        if (fileName === 'ECHO_core.sys') {
+                            if (typeof gameState !== 'undefined') {
+                                gameState.ritualPieces.code = true;
+                                if (typeof checkRitualProgress === 'function') checkRitualProgress();
+                            }
+                            if (typeof triggerGlitch === 'function') triggerGlitch();
+                            if (typeof triggerEchoAppearance === 'function') setTimeout(() => triggerEchoAppearance(), 2000);
+                        }
+
+                        window.launchApp('notepad', content);
+                    }
+                }
+            };
+        });
+
+    </script>
+
+</body>
+
+</html>
